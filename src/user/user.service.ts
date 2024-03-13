@@ -16,7 +16,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async findAll() {
     const users = await this.userRepository.find();
@@ -25,7 +25,8 @@ export class UserService {
   }
 
   async findOne(id: string) {
-    const user = await this.userRepository.findOne(id, {
+    const user = await this.userRepository.findOne({
+      where: { id },
       relations: ['room'],
     });
 
@@ -37,13 +38,13 @@ export class UserService {
   }
 
   async findOneByUsername(username: string) {
-    const user = await this.userRepository.findOne({ username });
+    const user = await this.userRepository.findOneBy({ username });
 
     return user;
   }
 
   async create(createUserDto: CreateUserDto) {
-    const user = await this.userRepository.create({
+    const user = this.userRepository.create({
       ...createUserDto,
     });
 

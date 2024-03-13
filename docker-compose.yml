@@ -1,9 +1,13 @@
 version: "3"
 services:
-  db:
-    image:  postgres
-    restart: always 
+  app:
+    image: chat-app:dev
+    restart: no
+    build:
+      context: .
+      target: development
     ports:
-      - "5432:5432"
-    environment:
-       POSTGRES_PASSWORD: pass123
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules

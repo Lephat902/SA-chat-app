@@ -29,7 +29,7 @@ export class RoomService {
   }
 
   async findOne(id: string) {
-    const room = await this.roomRepository.findOne(id);
+    const room = await this.roomRepository.findOneBy({id});
 
     if (!room) {
       throw new NotFoundException(`There is no room under id ${id}`);
@@ -39,9 +39,10 @@ export class RoomService {
   }
 
   async findOneWithRelations(id: string) {
-    const room = await this.roomRepository.findOne(id, {
+    const room = await this.roomRepository.findOne({
+      where: { id },
       relations: ['messages', 'users', 'bannedUsers'],
-    });
+    });    
 
     if (!room) {
       throw new NotFoundException(`There is no room under id ${id}`);
@@ -51,13 +52,13 @@ export class RoomService {
   }
 
   async findOneByName(name: string) {
-    const room = await this.roomRepository.findOne({ name });
+    const room = await this.roomRepository.findOneBy({ name });
 
     return room;
   }
 
   async create(createRoomDto: CreateRoomDto) {
-    const room = await this.roomRepository.create({
+    const room = this.roomRepository.create({
       ...createRoomDto,
     });
 
@@ -70,7 +71,7 @@ export class RoomService {
     const room = await this.findOne(roomId);
     const user = await this.userService.findOne(userId);
 
-    const message = await this.messageRepository.create({
+    const message = this.messageRepository.create({
       text,
       room,
       user,

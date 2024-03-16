@@ -1,13 +1,11 @@
-import { InternalServerErrorException, ValidationPipe } from '@nestjs/common';
-import { NestFactory } from '@nestjs/core';
+import { ClassSerializerInterceptor, INestApplication, InternalServerErrorException, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-
 import * as cookieParser from 'cookie-parser';
-
 import { AppModule } from './app.module';
-
 import { AuthIoAdapter } from './chat/adapters/auth.adapter';
 import { ConfigService } from '@nestjs/config';
+import { GlobalExceptionsFilter } from './global-exceptions-filter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -23,7 +21,7 @@ async function bootstrap() {
     credentials: true,
     methods: 'GET,PUT,POST,PATCH,DELETE,UPDATE,OPTIONS',
     origin: (origin, callback) => {
-      if (!origin) {
+      if (!origin || origin === 'null') {
         // Allow requests with no origin (like mobile apps or curl requests)
         return callback(null, true);
       }
@@ -38,26 +36,42 @@ async function bootstrap() {
       }
     },
   });
-  
+
+  // Apply the custom exception filter globally
+  app.useGlobalFilters(new GlobalExceptionsFilter());
+
+  // Set up global interceptor to standardize output using class serialization
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
+      forbidNonWhitelisted: true,
       transform: true,
     }),
   );
 
   app.useWebSocketAdapter(new AuthIoAdapter(app));
 
-  const options = new DocumentBuilder()
-    .setTitle('Realtime Chat')
-    .setDescription('Chat created using Nest.js + Websockets')
-    .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('api', app, document);
+  // Set up Swagger documentation
+  setUpSwagger(app);
 
   // Start the application and listen on the specified port
   await app.listen(configService.get<number>('PORT'));
 }
 
 bootstrap();
+
+const setUpSwagger = (app: INestApplication<any>) => {
+  // Configure Swagger options
+  const swaggerOptions = new DocumentBuilder()
+    .setTitle('Realtime Chat App for Software Architecture Project')
+    .setDescription('Chat created using Nest.js + Websockets')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  // Create Swagger document and set up Swagger UI
+  const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
+  SwaggerModule.setup('api', app, swaggerDocument);
+};

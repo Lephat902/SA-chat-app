@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpException,
   HttpStatus,
   Post,
@@ -8,26 +9,39 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-
 import { Request, Response } from 'express';
-
 import { AuthService } from './auth.service';
-
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { CreateUserDto, LoginUserDto } from 'src/user/dtos';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
+import { UserService } from 'src/user/services';
 
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
-
-@Controller('auth')
+@Controller()
+@ApiTags('Authentication')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly userService: UserService,
+  ) { }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  @ApiBearerAuth()
+  async getProfile(
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user.id;
+    return this.userService.findOneById(userId);
+  }
 
   @Post('/signUp')
-  async singUp(
+  async signUp(
     @Body() userDto: CreateUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.singUp(userDto);
+    const tokens = await this.authService.signUp(userDto);
 
     if (!tokens) {
       throw new HttpException(
@@ -46,7 +60,7 @@ export class AuthController {
 
   @Post('/signIn')
   @UseGuards(LocalAuthGuard)
-  async singIn(
+  async signIn(
     @Body() userDto: LoginUserDto,
     @Res({ passthrough: true }) res: Response,
   ) {
@@ -60,7 +74,7 @@ export class AuthController {
     return tokens;
   }
 
-  @Post('/update')
+  @Post('tokens/update')
   async updateTokens(@Req() req: Request) {
     const { refreshToken } = req.cookies;
 

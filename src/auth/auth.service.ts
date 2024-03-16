@@ -2,16 +2,17 @@ import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 import * as bcrypt from 'bcryptjs';
 
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services';
 
-import { User } from 'src/user/entities/user.entity';
-import { CreateUserDto } from 'src/user/dto/create-user.dto';
-import { LoginUserDto } from 'src/user/dto/login-user.dto';
+import { User } from 'src/user/entities';
+import { CreateUserDto } from 'src/user/dtos';
+import { LoginUserDto } from 'src/user/dtos/login-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -20,12 +21,14 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async singUp(userDto: CreateUserDto) {
+  async signUp(userDto: CreateUserDto) {
     const candidate = await this.userService.findOneByUsername(
       userDto.username,
     );
 
-    if (candidate) return null;
+    if (candidate) {
+      throw new BadRequestException("Username exists");
+    };
 
     const hashedPassword = await bcrypt.hash(userDto.password, 7);
     const user = await this.userService.create({

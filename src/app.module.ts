@@ -4,7 +4,11 @@ import { ChatModule } from './chat/chat.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { RoomModule } from './room/room.module';
+import { ConversationModule } from './conversation/conversation.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { FriendModule } from './friend/friend.module';
+import { FriendRequestModule } from './friend-request/friend-request.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
   imports: [
@@ -21,11 +25,14 @@ import { RoomModule } from './room/room.module';
       }),
       inject: [ConfigService],
     }),
+    EventEmitterModule.forRoot(),
     ChatModule,
-    UserModule,
     AuthModule,
-    RoomModule,
+    ConversationModule,
+    FriendModule,
+    FriendRequestModule,
+    MessageModule,
+    UserModule,
   ],
-  providers: [],
 })
 export class AppModule { }

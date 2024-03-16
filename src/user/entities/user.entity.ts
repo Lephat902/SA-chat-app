@@ -2,14 +2,13 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  JoinTable,
   OneToMany,
   ManyToMany,
 } from 'typeorm';
-
-import { Room } from 'src/room/entities/room.entity';
-import { Message } from 'src/room/entities/message.entity';
+import { Conversation } from 'src/conversation/entities/conversation.entity';
+import { Message } from 'src/message/entities';
+import { Exclude } from 'class-transformer';
+import { FriendRequest } from 'src/friend-request/entities';
 
 @Entity()
 export class User {
@@ -20,22 +19,21 @@ export class User {
   username: string;
 
   @Column({ length: 60 })
+  @Exclude()
   password: string;
 
   @Column()
   avatar: string;
 
-  @Column()
-  is_admin: boolean;
-
-  @JoinTable()
-  @ManyToOne(() => Room, (room: Room) => room.users)
-  room: Room;
-
-  @JoinTable()
-  @ManyToMany(() => Room, (room: Room) => room.bannedUsers, { eager: true })
-  bannedRooms: Array<Room>;
+  @ManyToMany(() => Conversation, conversation => conversation.users)
+  conversations: Conversation[];
 
   @OneToMany(() => Message, (message: Message) => message.user)
   messages: Array<Message>;
+
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.requester)
+  sentFriendRequests: FriendRequest[];
+  
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.recipient)
+  receivedFriendRequests: FriendRequest[];  
 }

@@ -1,8 +1,7 @@
 import { INestApplicationContext } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-
 import { AuthService } from 'src/auth/auth.service';
-import { UserService } from 'src/user/user.service';
+import { UserService } from 'src/user/services';
 
 export class AuthIoAdapter extends IoAdapter {
   private readonly authService: AuthService;
@@ -21,7 +20,7 @@ export class AuthIoAdapter extends IoAdapter {
       const isVerified =
         token && (await this.authService.verifyAccessToken(token));
       const userExists =
-        isVerified && (await this.userService.findOne(isVerified.id));
+        isVerified && (await this.userService.findOneById(isVerified.id));
 
       if (isVerified && userExists) {
         return allowFunction(null, true);

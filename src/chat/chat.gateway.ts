@@ -1,163 +1,117 @@
-import { ForbiddenException, UsePipes, ValidationPipe } from '@nestjs/common';
+import { UsePipes, ValidationPipe } from '@nestjs/common';
 import {
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-
-import { Socket } from 'socket.io';
-
-import { UserService } from 'src/user/user.service';
+import { Server, Socket } from 'socket.io';
+import { UserService } from 'src/user/services';
 import { AuthService } from 'src/auth/auth.service';
-import { RoomService } from 'src/room/room.service';
-
-import { AddMessageDto } from './dto/add-message.dto';
-import { JoinRoomDto } from './dto/join-room.dto';
-import { LeaveRoomDto } from './dto/leave-room.dto';
-import { KickUserDto } from './dto/kick-user.dto';
-import { BanUserDto } from './dto/ban-user.dto';
+import { SocketUserMap } from './user-socket.map';
+import { OnEvent } from '@nestjs/event-emitter';
+import {
+  USER_ADDED_TO_GROUP_EVENT,
+  USER_REMOVED_FROM_GROUP_EVENT,
+  UserAddedToGroupEvent,
+  UserRemovedFromGroupEvent,
+  CONVERSATION_MESSAGE_ADDED,
+  ConversationMessageAddedEvent,
+  CONVERSATION_CREATED_EVENT,
+  ConversationCreatedEvent,
+  CONVERSATION_DELETED_EVENT,
+  ConversationDeletedEvent,
+} from 'src/events';
 
 @UsePipes(new ValidationPipe())
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: ["null"],
+    methods: ["GET", "POST"],
+    transports: ['websocket', 'polling'],
+    credentials: true
+  },
+  allowEIO3: true,
+})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
-  server;
+  private readonly server: Server;
 
-  connectedUsers: Map<string, string> = new Map();
+  // socket-client-id <-> system-user-id
+  private readonly socketUserMap: SocketUserMap = new SocketUserMap();
 
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
-    private readonly roomService: RoomService,
-  ) {}
+  ) { }
 
   async handleConnection(client: Socket): Promise<void> {
-    const token = client.handshake.query.token.toString();
+    const token = client.handshake?.query.token.toString();
     const payload = this.authService.verifyAccessToken(token);
 
-    const user = payload && (await this.userService.findOne(payload.id));
-    const room = user?.room;
+    const user = payload && (await this.userService.findOneById(payload.id, true));
 
+    // User not exist then destroy the connection
     if (!user) {
       client.disconnect(true);
-
       return;
     }
 
-    this.connectedUsers.set(client.id, user.id);
+    this.socketUserMap.addConnection(client.id, user.id);
 
-    if (room) {
-      return this.onRoomJoin(client, { roomId: room.id });
+    const conversations = user?.conversations;
+    if (conversations) {
+      await client.join(conversations.map(conversation => conversation.id));
     }
   }
 
   async handleDisconnect(client: Socket) {
-    this.connectedUsers.delete(client.id);
+    this.socketUserMap.removeConnection(client.id);
   }
 
-  @SubscribeMessage('message')
-  async onMessage(client: Socket, addMessageDto: AddMessageDto) {
-    const userId = this.connectedUsers.get(client.id);
-    const user = await this.userService.findOne(userId);
-
-    if (!user.room) {
-      return;
-    }
-
-    addMessageDto.userId = userId;
-    addMessageDto.roomId = user.room.id;
-
-    await this.roomService.addMessage(addMessageDto);
-
-    client.to(user.room.id).emit('message', addMessageDto.text);
+  @OnEvent(CONVERSATION_MESSAGE_ADDED)
+  async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
+    const { conversationId, text, userId, createdAt } = event;
+    this.server.to(conversationId).emit('message', { userId, text, createdAt });
   }
 
-  @SubscribeMessage('join')
-  async onRoomJoin(client: Socket, joinRoomDto: JoinRoomDto) {
-    const { roomId } = joinRoomDto;
-    const limit = 10;
-
-    const room = await this.roomService.findOneWithRelations(roomId);
-
-    if (!room) return;
-
-    const userId = this.connectedUsers.get(client.id);
-    const messages = room.messages.slice(limit * -1);
-
-    await this.userService.updateUserRoom(userId, room);
-
-    client.join(roomId);
-
-    client.emit('message', messages);
+  @OnEvent(USER_ADDED_TO_GROUP_EVENT)
+  async handleUserAddedToGroupEvent(event: UserAddedToGroupEvent) {
+    const { userId, conversationId } = event;
+    const client = this.socketUserMap.getSocketClientByUserId(this.server, userId);
+    await client.join(conversationId);
+    this.server.to(conversationId).emit('join', { userId });
   }
 
-  @SubscribeMessage('leave')
-  async onRoomLeave(client: Socket, leaveRoomDto: LeaveRoomDto) {
-    const { roomId } = leaveRoomDto;
-    const userId = this.connectedUsers.get(client.id);
-
-    await this.userService.updateUserRoom(userId, null);
-
-    client.leave(roomId);
+  @OnEvent(USER_REMOVED_FROM_GROUP_EVENT)
+  async handleUserRemovedFromGroupEvent(event: UserRemovedFromGroupEvent) {
+    const { conversationId, userId, isKicked } = event;
+    const client = this.socketUserMap.getSocketClientByUserId(this.server, userId);
+    await client.leave(conversationId);
+    this.server.to(conversationId).emit('leave', { userId, isKicked });
   }
 
-  @SubscribeMessage('user-kick')
-  async onUserKick(client: Socket, kickUserDto: KickUserDto) {
-    const { roomId, reason } = kickUserDto;
+  @OnEvent(CONVERSATION_CREATED_EVENT)
+  async handleConversationCreatedEvent(event: ConversationCreatedEvent) {
+    const { conversationId, membersIdsList } = event;
+    const userClients = membersIdsList.map(memberId =>
+      this.socketUserMap.getSocketClientByUserId(this.server, memberId)
+    );
 
-    const userId = this.connectedUsers.get(client.id);
-    const room = await this.roomService.findOneWithRelations(roomId);
-
-    if (userId !== room.ownerId) {
-      throw new ForbiddenException(`You are not the owner of the room!`);
-    }
-
-    await this.userService.updateUserRoom(kickUserDto.userId, null);
-
-    const kickedClient = this.getClientByUserId(kickUserDto.userId);
-
-    if (!kickedClient) return;
-
-    client.to(kickedClient.id).emit('kicked', reason);
-    kickedClient.leave(roomId);
+    await Promise.allSettled(userClients.map(client =>
+      client.join(conversationId)
+    ));
   }
 
-  @SubscribeMessage('user-ban')
-  async onUserBan(client: Socket, banUserDto: BanUserDto) {
-    const { roomId, reason } = banUserDto;
+  @OnEvent(CONVERSATION_DELETED_EVENT)
+  async handleConversationDeletedEvent(event: ConversationDeletedEvent) {
+    const { conversationId, membersIdsList } = event;
+    const userClients = membersIdsList.map(memberId =>
+      this.socketUserMap.getSocketClientByUserId(this.server, memberId)
+    );
 
-    const userId = this.connectedUsers.get(client.id);
-    const room = await this.roomService.findOneWithRelations(roomId);
-
-    if (userId !== room.ownerId) {
-      throw new ForbiddenException(`You are not the owner of the room!`);
-    }
-
-    if (userId === banUserDto.userId) {
-      throw new ForbiddenException(`You can't ban yourself`);
-    }
-
-    await this.roomService.banUserFromRoom(banUserDto);
-
-    const bannedClient = this.getClientByUserId(banUserDto.userId);
-
-    if (!bannedClient) return;
-
-    client.to(bannedClient.id).emit('banned', reason);
-    bannedClient.leave(roomId);
-  }
-
-  private getClientByUserId(userId: string): Socket | null {
-    for (const [key, value] of this.connectedUsers.entries()) {
-      if (value === userId) {
-        const kickedClient = this.server.sockets.sockets.get(key);
-
-        return kickedClient;
-      }
-    }
-
-    return null;
+    await Promise.allSettled(userClients.map(client =>
+      client.leave(conversationId)
+    ));
   }
 }

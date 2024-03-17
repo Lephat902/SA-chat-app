@@ -69,14 +69,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await client.join(conversations.map(conversation => conversation.id));
     }
 
-    await this.userService.updateOnlineStatus(user.id, true);
+    await this.updateOnlineStatus(user.id);
   }
 
   async handleDisconnect(client: Socket) {
     const userId = this.socketUserMap.getUserIdByClientId(client.id);
     this.socketUserMap.removeConnection(client.id);
-    // We assume there is just one device connects at a time
-    await this.userService.updateOnlineStatus(userId, false);
+    await this.updateOnlineStatus(userId);
+  }
+
+  private async updateOnlineStatus(userId: string) {
+    const numberOfSocketConnectionsLeft = this.socketUserMap.getNumOfClientsByUserId(userId);
+    await this.userService.updateOnlineStatus(userId, !!numberOfSocketConnectionsLeft);
   }
 
   @SubscribeMessage('friendsOnlineStatus')
@@ -94,40 +98,40 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(USER_ADDED_TO_GROUP_EVENT)
   async handleUserAddedToGroupEvent(event: UserAddedToGroupEvent) {
     const { userId, conversationId } = event;
-    const client = this.socketUserMap.getSocketClientByUserId(this.server, userId);
-    await client.join(conversationId);
+    const clients = this.socketUserMap.getSocketClientsByUserId(this.server, userId);
+    await Promise.allSettled(clients.map(client => client.join(conversationId)));
     this.server.to(conversationId).emit('join', { userId });
   }
 
   @OnEvent(USER_REMOVED_FROM_GROUP_EVENT)
   async handleUserRemovedFromGroupEvent(event: UserRemovedFromGroupEvent) {
     const { conversationId, userId, isKicked } = event;
-    const client = this.socketUserMap.getSocketClientByUserId(this.server, userId);
-    await client.leave(conversationId);
+    const clients = this.socketUserMap.getSocketClientsByUserId(this.server, userId);
+    await Promise.allSettled(clients.map(client => client.leave(conversationId)));
     this.server.to(conversationId).emit('leave', { userId, isKicked });
   }
 
   @OnEvent(CONVERSATION_CREATED_EVENT)
   async handleConversationCreatedEvent(event: ConversationCreatedEvent) {
     const { conversationId, membersIdsList } = event;
-    const userClients = membersIdsList.map(memberId =>
-      this.socketUserMap.getSocketClientByUserId(this.server, memberId)
+    const usersClients = membersIdsList.map(memberId =>
+      this.socketUserMap.getSocketClientsByUserId(this.server, memberId)
     );
 
-    await Promise.allSettled(userClients.map(client =>
-      client.join(conversationId)
+    await Promise.allSettled(usersClients.map(clients =>
+      Promise.allSettled(clients.map(client => client.join(conversationId)))
     ));
   }
 
   @OnEvent(CONVERSATION_DELETED_EVENT)
   async handleConversationDeletedEvent(event: ConversationDeletedEvent) {
     const { conversationId, membersIdsList } = event;
-    const userClients = membersIdsList.map(memberId =>
-      this.socketUserMap.getSocketClientByUserId(this.server, memberId)
+    const usersClients = membersIdsList.map(memberId =>
+      this.socketUserMap.getSocketClientsByUserId(this.server, memberId)
     );
 
-    await Promise.allSettled(userClients.map(client =>
-      client.leave(conversationId)
+    await Promise.allSettled(usersClients.map(clients =>
+      Promise.allSettled(clients.map(client => client.leave(conversationId)))
     ));
   }
 

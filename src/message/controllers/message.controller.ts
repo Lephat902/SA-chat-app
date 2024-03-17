@@ -5,6 +5,7 @@ import {
   Get,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -16,7 +17,7 @@ import { MessageService } from '../services';
 import { ConversationService } from 'src/conversation/services';
 import { RequestWithUser } from 'src/common/interfaces';
 
-@Controller('conversations/:id')
+@Controller('conversations')
 @ApiTags("Conversation's Message")
 @ApiBearerAuth()
 export class MessageController {
@@ -26,7 +27,7 @@ export class MessageController {
   ) { }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/messages')
+  @Post('/:id/messages')
   async addMessage(
     @Param('id') id: string,
     @Body() addMessageDto: AddMessageDto,
@@ -38,7 +39,17 @@ export class MessageController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('/messages')
+  @Put('/messages/:messageId/mark-as-read')
+  async markMessageAsRead(
+    @Param('messageId') messageId: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const userIdMakeRequest = req.user.id;
+    return this.messageService.markAsLastRead(userIdMakeRequest, messageId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('/:id/messages')
   async getMessages(
     @Param('id') id: string,
     @Query() messageQueryDto: MessageQueryDto,

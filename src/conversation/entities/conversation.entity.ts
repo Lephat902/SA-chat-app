@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/user/entities';
 import { Message } from 'src/message/entities/message.entity';
+import { UserConversation } from 'src/message/entities';
 
 @Entity()
 @TableInheritance({ column: { type: "varchar", name: "type" } })
@@ -21,4 +22,7 @@ export abstract class Conversation {
 
   @OneToMany(() => Message, (message: Message) => message.conversation)
   messages: Array<Message>;
+
+  @OneToMany(() => UserConversation, userConversation => userConversation.conversation)
+  userConversations: UserConversation[];
 }

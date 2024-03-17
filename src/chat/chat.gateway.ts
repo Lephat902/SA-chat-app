@@ -22,6 +22,8 @@ import {
   ConversationCreatedEvent,
   CONVERSATION_DELETED_EVENT,
   ConversationDeletedEvent,
+  LAST_READ_MESSAGE_EVENT,
+  LastReadMessageEvent,
 } from 'src/events';
 import { FriendService } from 'src/friend/services';
 
@@ -127,5 +129,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await Promise.allSettled(userClients.map(client =>
       client.leave(conversationId)
     ));
+  }
+
+  @OnEvent(LAST_READ_MESSAGE_EVENT)
+  async handleLastReadMessageEvent(event: LastReadMessageEvent) {
+    const { conversationId, userId, lastReadMessageId } = event;
+    this.server.to(conversationId).emit('lastReadMessage', { userId, lastReadMessageId });
   }
 }

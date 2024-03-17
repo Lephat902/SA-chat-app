@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { FriendRequest, RequestStatus } from '../entities/friend-request.entity';
-import { FRIEND_REQUEST_CREATED_EVENT, FRIEND_REQUEST_UPDATED_EVENT, FriendRequestCreatedEvent, FriendRequestUpdatedEvent } from 'src/events/friend-request';
+import { FRIEND_REQUEST_CREATED_EVENT, FRIEND_REQUEST_UPDATED_EVENT, FriendRequestCreatedEvent, FriendRequestUpdatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
 
 const ERROR_SELF_REQUEST = 'You cannot send a friend request to yourself.';

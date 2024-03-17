@@ -31,6 +31,31 @@ export class FriendService {
         return friends.map(friend => friend.user1.id === userId ? friend.user2 : friend.user1);
     }
 
+    async findFriendsOnlineStatus(userId: string): Promise<Partial<User>[]> {
+        const friends = await this.friendRepository
+            .createQueryBuilder('friend')
+            .leftJoinAndSelect('friend.user1', 'user1')
+            .leftJoinAndSelect('friend.user2', 'user2')
+            .where('friend.user1.id = :userId OR friend.user2.id = :userId', { userId })
+            .select([
+                'friend.id',
+                'user1.id',
+                'user1.isOnline',
+                'user2.id',
+                'user2.isOnline'
+            ])
+            .getMany();
+
+        const friendsStatus = friends.map(friend => {
+            return {
+                id: friend.user1.id === userId ? friend.user2.id : friend.user1.id,
+                isOnline: friend.user1.id === userId ? friend.user2.isOnline : friend.user1.isOnline,
+            };
+        });
+
+        return friendsStatus;
+    }
+
     async addFriend(firstUserId: string, secondUserId: string): Promise<void> {
         // Check if the friendship already exists
         const existingFriendship = await this.friendRepository.findOne({

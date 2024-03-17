@@ -65,18 +65,18 @@ export class FriendRequestService {
     }
 
     async acceptFriendRequest(userId: string, requestId: string) {
-        return this.updateFriendRequestStatusByRecipient(userId, 'recipient', requestId, RequestStatus.ACCEPTED);
+        return this.updateFriendRequestStatus(userId, 'recipient', requestId, RequestStatus.ACCEPTED);
     }
 
     async rejectFriendRequest(userId: string, requestId: string) {
-        return this.updateFriendRequestStatusByRecipient(userId, 'recipient', requestId, RequestStatus.REJECTED);
+        return this.updateFriendRequestStatus(userId, 'recipient', requestId, RequestStatus.REJECTED);
     }
 
     async cancelFriendRequest(userId: string, requestId: string) {
-        return this.updateFriendRequestStatusByRecipient(userId, 'requester', requestId, RequestStatus.CANCELLED);
+        return this.updateFriendRequestStatus(userId, 'requester', requestId, RequestStatus.CANCELLED);
     }
 
-    private async updateFriendRequestStatusByRecipient(
+    private async updateFriendRequestStatus(
         userId: string,
         actorType: 'requester' | 'recipient',
         requestId: string,
@@ -88,6 +88,7 @@ export class FriendRequestService {
                 [actorType]: { id: userId }, // Ensuring that only the <actorType> can manipulate with the request
                 status: RequestStatus.PENDING,
             },
+            relations: ['requester', 'recipient'],
         });
 
         if (!request) {

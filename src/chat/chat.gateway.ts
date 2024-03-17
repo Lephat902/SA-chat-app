@@ -4,6 +4,7 @@ import {
   OnGatewayDisconnect,
   WebSocketGateway,
   WebSocketServer,
+  SubscribeMessage,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/services';
@@ -22,6 +23,7 @@ import {
   CONVERSATION_DELETED_EVENT,
   ConversationDeletedEvent,
 } from 'src/events';
+import { FriendService } from 'src/friend/services';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -43,6 +45,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly userService: UserService,
     private readonly authService: AuthService,
+    private readonly friendService: FriendService,
   ) { }
 
   async handleConnection(client: Socket): Promise<void> {
@@ -63,10 +66,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (conversations) {
       await client.join(conversations.map(conversation => conversation.id));
     }
+
+    await this.userService.updateOnlineStatus(user.id, true);
   }
 
   async handleDisconnect(client: Socket) {
+    const userId = this.socketUserMap.getUserIdByClientId(client.id);
     this.socketUserMap.removeConnection(client.id);
+    // We assume there is just one device connects at a time
+    await this.userService.updateOnlineStatus(userId, false);
+  }
+
+  @SubscribeMessage('friendsOnlineStatus')
+  async getFriendsOnlineStatus(client: Socket, data: unknown) {
+    const userId = this.socketUserMap.getUserIdByClientId(client.id);
+    client.emit('friendsOnlineStatus', await this.friendService.findFriendsOnlineStatus(userId));
   }
 
   @OnEvent(CONVERSATION_MESSAGE_ADDED)

@@ -45,6 +45,7 @@ export class SocketUserMap {
     }
 
     getNumOfClientsByUserId(userId: string): number {
-        return Number(!!this.userIdToClientIds.get(userId)?.size);
+        const numberOfClients = this.userIdToClientIds.get(userId)?.size;
+        return numberOfClients ?? 0;
     }
 }

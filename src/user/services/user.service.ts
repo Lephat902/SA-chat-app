@@ -50,4 +50,8 @@ export class UserService {
 
     return this.userRepository.save(user);
   }
+
+  updateOnlineStatus(id: string, isOnline: boolean) {
+    return this.userRepository.update(id, { isOnline });
+  }
 }

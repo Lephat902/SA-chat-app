@@ -25,6 +25,9 @@ export class User {
   @Column()
   avatar: string;
 
+  @Column({ default: false })
+  isOnline: boolean;
+
   @ManyToMany(() => Conversation, conversation => conversation.users)
   conversations: Conversation[];
 

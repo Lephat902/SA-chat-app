@@ -47,7 +47,7 @@ export class FriendRequestController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/received-requests/{requestId}/accept')
+  @Put('/received-requests/:requestId/accept')
   async acceptFriendRequest(
     @Req() req: RequestWithUser,
     @Param('requestId') requestId: string,
@@ -57,7 +57,7 @@ export class FriendRequestController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/received-requests/{requestId}/reject')
+  @Put('/received-requests/:requestId/reject')
   async rejectFriendRequest(
     @Req() req: RequestWithUser,
     @Param('requestId') requestId: string,
@@ -67,7 +67,7 @@ export class FriendRequestController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('/sent-requests/{requestId}/cancel')
+  @Put('/sent-requests/:requestId/cancel')
   async cancelFriendRequest(
     @Req() req: RequestWithUser,
     @Param('requestId') requestId: string,

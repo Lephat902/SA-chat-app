@@ -24,6 +24,8 @@ import {
   ConversationDeletedEvent,
   LAST_READ_MESSAGE_EVENT,
   LastReadMessageEvent,
+  ONLINE_STATUS_UPDATED_EVENT,
+  OnlineStatusUpdatedEvent,
 } from 'src/events';
 import { FriendService } from 'src/friend/services';
 
@@ -68,25 +70,33 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (conversations) {
       await client.join(conversations.map(conversation => conversation.id));
     }
-
-    await this.updateOnlineStatus(user.id);
+    const newNumberOfSocketConnections = this.socketUserMap.getNumOfClientsByUserId(user.id);
+    if (newNumberOfSocketConnections === 1)
+      await this.userService.updateOnlineStatus(user.id, true);
   }
 
   async handleDisconnect(client: Socket) {
     const userId = this.socketUserMap.getUserIdByClientId(client.id);
     this.socketUserMap.removeConnection(client.id);
-    await this.updateOnlineStatus(userId);
-  }
-
-  private async updateOnlineStatus(userId: string) {
-    const numberOfSocketConnectionsLeft = this.socketUserMap.getNumOfClientsByUserId(userId);
-    await this.userService.updateOnlineStatus(userId, !!numberOfSocketConnectionsLeft);
+    const newNumberOfSocketConnections = this.socketUserMap.getNumOfClientsByUserId(userId);
+    if (newNumberOfSocketConnections === 0)
+      await this.userService.updateOnlineStatus(userId, false);
   }
 
   @SubscribeMessage('friendsOnlineStatus')
   async getFriendsOnlineStatus(client: Socket, data: unknown) {
     const userId = this.socketUserMap.getUserIdByClientId(client.id);
     client.emit('friendsOnlineStatus', await this.friendService.findFriendsOnlineStatus(userId));
+  }
+
+  @OnEvent(ONLINE_STATUS_UPDATED_EVENT)
+  async handleOnlineStatusUpdatedEvent(event: OnlineStatusUpdatedEvent) {
+    const { userId } = event;
+    const friendsList = await this.friendService.getFriends(userId);
+    friendsList.forEach(friend => {
+      const clients = this.socketUserMap.getSocketClientsByUserId(this.server, friend.id);
+      clients.forEach(client => client.emit('isOnline', event));
+    })
   }
 
   @OnEvent(CONVERSATION_MESSAGE_ADDED)

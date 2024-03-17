@@ -4,35 +4,47 @@ export class SocketUserMap {
     // Maps socket client ID to system user ID
     clientIdToUserId: Map<string, string> = new Map();
 
-    // Maps system user ID to socket client ID
-    userIdToClientId: Map<string, string> = new Map();
+    // Maps system user ID to a set of socket client IDs
+    userIdToClientIds: Map<string, Set<string>> = new Map();
 
     // Example method to add a connection
     addConnection(clientId: string, userId: string) {
         this.clientIdToUserId.set(clientId, userId);
-        this.userIdToClientId.set(userId, clientId);
+        if (!this.userIdToClientIds.has(userId)) {
+            this.userIdToClientIds.set(userId, new Set());
+        }
+        this.userIdToClientIds.get(userId)?.add(clientId);
     }
 
     // Example method to remove a connection
     removeConnection(clientId: string) {
         const userId = this.clientIdToUserId.get(clientId);
         if (userId) {
-            this.userIdToClientId.delete(userId);
+            this.userIdToClientIds.get(userId)?.delete(clientId);
+            if (this.getNumOfClientsByUserId(userId) === 0) {
+                this.userIdToClientIds.delete(userId);
+            }
             this.clientIdToUserId.delete(clientId);
         }
     }
 
-    // Get Socket by User ID
-    getSocketClientByUserId(server: Server, userId: string): Socket | null {
-        const clientId = this.userIdToClientId.get(userId);
-        if (clientId) {
-            return server.sockets.sockets.get(clientId);
+    // Get Sockets by User ID
+    getSocketClientsByUserId(server: Server, userId: string): Socket[] {
+        const clientIds = this.userIdToClientIds.get(userId);
+        if (clientIds) {
+            return Array.from(clientIds)
+                .map(clientId => server.sockets.sockets.get(clientId))
+                .filter(socket => socket !== undefined);
         }
-        return null;
+        return [];
     }
 
     // Optionally, get User ID by Socket Client ID
     getUserIdByClientId(clientId: string): string | null {
         return this.clientIdToUserId.get(clientId) || null;
+    }
+
+    getNumOfClientsByUserId(userId: string): number {
+        return Number(!!this.userIdToClientIds.get(userId)?.size);
     }
 }

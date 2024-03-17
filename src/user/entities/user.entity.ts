@@ -6,7 +6,7 @@ import {
   ManyToMany,
 } from 'typeorm';
 import { Conversation } from 'src/conversation/entities/conversation.entity';
-import { Message } from 'src/message/entities';
+import { Message, UserConversation } from 'src/message/entities';
 import { Exclude } from 'class-transformer';
 import { FriendRequest } from 'src/friend-request/entities';
 
@@ -36,7 +36,10 @@ export class User {
 
   @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.requester)
   sentFriendRequests: FriendRequest[];
-  
+
   @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.recipient)
-  receivedFriendRequests: FriendRequest[];  
+  receivedFriendRequests: FriendRequest[];
+
+  @OneToMany(() => UserConversation, userConversation => userConversation.user)
+  userConversations: UserConversation[];
 }

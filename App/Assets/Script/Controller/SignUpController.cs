@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using System.Collections;
 
 public class SignUpController : MonoBehaviour
 {
@@ -49,13 +50,9 @@ public class SignUpController : MonoBehaviour
             avatar = signUpAvatar.text
         };
 
-        using UnityWebRequest request = UnityWebRequest.Post(StaticURL.DOMAIN + "/signUp", JsonUtility.ToJson(data));
-
-        var result = request.SendWebRequest();
-        await UniTask.WaitUntil(() => result.isDone);
-
-        if (request.result != UnityWebRequest.Result.Success)
-            statusText.text = request.error;
+        var result = await StaticURL.POST(StaticURL.DOMAIN + "/signUp", JsonUtility.ToJson(data));
+        if (result.IsSuccessStatusCode)
+            statusText.text = result.Content.ToString();
 
         else
         {

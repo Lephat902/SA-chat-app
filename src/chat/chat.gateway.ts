@@ -32,7 +32,7 @@ import { FriendService } from 'src/friend/services';
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   cors: {
-    origin: ["null"],
+    origin: ["null", null],
     methods: ["GET", "POST"],
     transports: ['websocket', 'polling'],
     credentials: true

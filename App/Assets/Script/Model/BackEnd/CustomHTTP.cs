@@ -19,4 +19,15 @@ public static partial class CustomHTTP
             return respone;
         }
     }
+
+    private static async Task<HttpResponseMessage> GET(string url)
+    {
+        using (var client = new HttpClient())
+        {
+            var respone = await client.GetAsync(url);
+
+            Debug.Log("GET from " + url);
+            return respone;
+        }
+    }
 }

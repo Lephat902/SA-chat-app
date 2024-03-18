@@ -57,7 +57,7 @@ public class SignUpController : MonoBehaviour
         CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signUp", data,
             (res) =>
             {
-                userDataAsset.AccessToken = res.accesstoken;
+                userDataAsset.AccessToken = res.accessToken;
                 statusText.text = "Sign Up success!";
                 StartHome();
             },
@@ -82,7 +82,7 @@ public class SignUpController : MonoBehaviour
         CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signIn", data,
             (res) =>
             {
-                userDataAsset.AccessToken = res.accesstoken;
+                userDataAsset.AccessToken = res.accessToken;
                 statusText.text = "Sign In success!";
                 StartHome();
             },

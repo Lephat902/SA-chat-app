@@ -6,7 +6,7 @@ using UnityEngine;
 
 public struct LoginSuccessRequest
 {
-    public string accesstoken;
+    public string accessToken;
 }
 
 public struct LoginFailRequest

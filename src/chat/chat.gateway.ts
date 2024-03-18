@@ -147,7 +147,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @AsyncApiSub({
-    channel: 'join',
+    channel: 'conversation-created',
     message: {
       payload: ConversationCreatedEvent
     },

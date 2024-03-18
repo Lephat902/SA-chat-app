@@ -4,7 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public struct FailRequest
+public struct LoginSuccessRequest
+{
+    public string accesstoken;
+}
+
+public struct LoginFailRequest
 {
     public List<string> message;
 }
@@ -25,17 +30,17 @@ public struct SignInModel
 
 public static partial class CustomHTTP
 {
-    public static async void SignUp(string url, object data, Action result, Action<FailRequest> error)
+    public static async void SignUp(string url, object data, Action<LoginSuccessRequest> result, Action<LoginFailRequest> error)
     {
         var response = await POST(url, data);
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Debug.Log("Result: " + JsonUtility.ToJson(content));
+        Debug.Log("Result: " + content);
 
         if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<FailRequest>(content));
+            error.Invoke(JsonUtility.FromJson<LoginFailRequest>(content));
         else
-            result.Invoke();
+            result.Invoke(JsonUtility.FromJson<LoginSuccessRequest>(content));
     }
 }

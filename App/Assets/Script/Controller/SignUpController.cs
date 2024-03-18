@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class SignUpController : MonoBehaviour
 {
@@ -24,6 +25,9 @@ public class SignUpController : MonoBehaviour
 
     [Header("Other")]
     [SerializeField] private TextMeshProUGUI statusText;
+
+    [Header("Data")]
+    [SerializeField] private UserDataAsset userDataAsset;
 
     void Start()
     {
@@ -51,8 +55,9 @@ public class SignUpController : MonoBehaviour
         };
 
         CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signUp", data,
-            () =>
+            (res) =>
             {
+                userDataAsset.AccessToken = res.accesstoken;
                 statusText.text = "Sign Up success!";
                 StartHome();
             },
@@ -75,8 +80,9 @@ public class SignUpController : MonoBehaviour
         };
 
         CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signIn", data,
-            () =>
+            (res) =>
             {
+                userDataAsset.AccessToken = res.accesstoken;
                 statusText.text = "Sign In success!";
                 StartHome();
             },
@@ -92,5 +98,7 @@ public class SignUpController : MonoBehaviour
 
     private void ClearStatus() => statusText.text = string.Empty;
 
-    private void StartHome() { }
+    private void StartHome() {
+        SceneManager.LoadScene("Home", LoadSceneMode.Single);
+    }
 }

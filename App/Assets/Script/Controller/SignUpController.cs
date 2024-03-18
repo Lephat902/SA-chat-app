@@ -41,7 +41,7 @@ public class SignUpController : MonoBehaviour
         signInSwitch.onClick.RemoveAllListeners();
     }
 
-    private async void SignUp()
+    private void SignUp()
     {
         var data = new SignUpModel()
         {
@@ -50,15 +50,13 @@ public class SignUpController : MonoBehaviour
             avatar = signUpAvatar.text
         };
 
-        var result = await StaticURL.POST(StaticURL.DOMAIN + "/signUp", JsonUtility.ToJson(data));
-        if (result.IsSuccessStatusCode)
-            statusText.text = result.Content.ToString();
-
-        else
-        {
-            statusText.text = "Sign up success!";
-            StartHome();
-        }
+        CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signUp", data,
+            () =>
+            {
+                statusText.text = "Sign Up success!";
+                StartHome();
+            },
+            (err) => { statusText.text = err.message[0]; });
     }
 
     private void SwitchToSignIn()
@@ -76,16 +74,13 @@ public class SignUpController : MonoBehaviour
             password = signUpPassWord.text
         };
 
-        using UnityWebRequest request = UnityWebRequest.Post(StaticURL.DOMAIN + "/signIn", JsonUtility.ToJson(data));
-
-        if (request.result != UnityWebRequest.Result.Success)
-            statusText.text = request.error;
-
-        else
-        {
-            statusText.text = "Sign In success!";
-            StartHome();
-        }
+        CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signIn", data,
+            () =>
+            {
+                statusText.text = "Sign In success!";
+                StartHome();
+            },
+            (err) => { statusText.text = err.message[0]; });
     }
 
     private void SwitchToSignUp()

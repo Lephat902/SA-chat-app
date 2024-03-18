@@ -1,16 +1,16 @@
 ﻿using System;
+using Unity.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "UserDataAsset", menuName = "ScriptableObjects/UserDataAsset")]
-class UserDataAsset: ScriptableObject
+class UserDataAsset : ScriptableObject
 {
-    public string dataFileName;
-    private string accessToken;
+    [ReadOnly] [SerializeField] private string accessToken;
 
     public string AccessToken
     {
         get { return accessToken; }
-        set { accessToken = value;  }
+        set { accessToken = value; }
     }
 }
 

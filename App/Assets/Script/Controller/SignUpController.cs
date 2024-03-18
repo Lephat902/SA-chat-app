@@ -2,6 +2,7 @@ using UnityEngine.Networking;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class SignUpController : MonoBehaviour
 {
@@ -39,7 +40,7 @@ public class SignUpController : MonoBehaviour
         signInSwitch.onClick.RemoveAllListeners();
     }
 
-    private void SignUp()
+    private async void SignUp()
     {
         var data = new SignUpModel()
         {
@@ -50,7 +51,8 @@ public class SignUpController : MonoBehaviour
 
         using UnityWebRequest request = UnityWebRequest.Post(StaticURL.DOMAIN + "/signUp", JsonUtility.ToJson(data));
 
-        request.SendWebRequest();
+        var result = request.SendWebRequest();
+        await UniTask.WaitUntil(() => result.isDone);
 
         if (request.result != UnityWebRequest.Result.Success)
             statusText.text = request.error;
@@ -66,6 +68,7 @@ public class SignUpController : MonoBehaviour
     {
         signUpObject.SetActive(false);
         signInObject.SetActive(true);
+        ClearStatus();
     }
 
     private void SignIn()
@@ -92,7 +95,10 @@ public class SignUpController : MonoBehaviour
     {
         signUpObject.SetActive(true);
         signInObject.SetActive(false);
+        ClearStatus();
     }
+
+    private void ClearStatus() => statusText.text = string.Empty;
 
     private void StartHome() { }
 }

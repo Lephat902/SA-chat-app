@@ -75,8 +75,8 @@ public class SignUpController : MonoBehaviour
     {
         var data = new SignInModel()
         {
-            username = signUpUserName.text,
-            password = signUpPassWord.text
+            username = signInUserName.text,
+            password = signInPassWord.text
         };
 
         CustomHTTP.SignUp(CustomHTTP.DOMAIN + "/signIn", data,

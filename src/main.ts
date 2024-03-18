@@ -6,6 +6,7 @@ import { AppModule } from './app.module';
 import { AuthIoAdapter } from './chat/adapters/auth.adapter';
 import { ConfigService } from '@nestjs/config';
 import { GlobalExceptionsFilter } from './global-exceptions-filter';
+import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -56,6 +57,8 @@ async function bootstrap() {
   // Set up Swagger documentation
   setUpSwagger(app);
 
+  await setUpAsyncApi(app);
+
   // Start the application and listen on the specified port
   await app.listen(configService.get<number>('PORT'));
 }
@@ -74,4 +77,21 @@ const setUpSwagger = (app: INestApplication<any>) => {
   // Create Swagger document and set up Swagger UI
   const swaggerDocument = SwaggerModule.createDocument(app, swaggerOptions);
   SwaggerModule.setup('api', app, swaggerDocument);
+};
+
+const setUpAsyncApi = async (app: INestApplication<any>) => {
+  const asyncApiOptions = new AsyncApiDocumentBuilder()
+    .setTitle('Realtime Chat App API')
+    .setDescription('Chat created using Nest.js + Websockets')
+    .setVersion('1.0')
+    .setDefaultContentType('application/json')
+    .addSecurity('user-password', { type: 'userPassword' })
+    // .addServer('feline-ws', {
+    //   url: 'ws://localhost:3000',
+    //   protocol: 'socket.io',
+    // })
+    .build();
+
+  const asyncapiDocument = AsyncApiModule.createDocument(app, asyncApiOptions);
+  await AsyncApiModule.setup('socket-api', app, asyncapiDocument);
 };

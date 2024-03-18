@@ -5,7 +5,7 @@ import { UserService } from 'src/user/services';
 import { Message } from '../entities/message.entity';
 import { isObjectWithIdExist } from 'src/helpers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CONVERSATION_MESSAGE_ADDED, ConversationMessageAddedEvent, LAST_READ_MESSAGE_EVENT, LastReadMessageEvent } from 'src/events';
+import { CONVERSATION_MESSAGE_ADDED, ConversationMessageAddedEvent, LAST_READ_MESSAGE_UPDATED_EVENT, LastReadMessageUpdatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
 import { AddMessageDto, MessageQueryDto } from '../dtos';
 import { UserConversation } from '../entities';
@@ -44,7 +44,7 @@ export class MessageService {
     userConversation.lastReadMessage = message;
     await this.userConversationRepository.save(userConversation);
 
-    this.emitLastReadMessageEvent(message.conversation.id, messageId, userId);
+    this.emitLastReadMessageUpdatedEvent(message.conversation.id, messageId, userId);
   }
 
   // Kind of a helper method, not called directly by client
@@ -175,12 +175,12 @@ export class MessageService {
     }
   }
 
-  private emitLastReadMessageEvent(conversationId: string, messageId: string, userId: string) {
-    const eventPayload = Builder<LastReadMessageEvent>()
+  private emitLastReadMessageUpdatedEvent(conversationId: string, messageId: string, userId: string) {
+    const eventPayload = Builder<LastReadMessageUpdatedEvent>()
       .userId(userId)
       .conversationId(conversationId)
       .lastReadMessageId(messageId)
       .build();
-    this.eventEmitter.emit(LAST_READ_MESSAGE_EVENT, eventPayload);
+    this.eventEmitter.emit(LAST_READ_MESSAGE_UPDATED_EVENT, eventPayload);
   }
 }

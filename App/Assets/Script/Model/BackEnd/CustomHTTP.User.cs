@@ -4,7 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
-public struct UserSuccessRequest
+[Serializable]
+public struct UserDataModel
 {
     public string accessToken;
     public string id;
@@ -13,11 +14,12 @@ public struct UserSuccessRequest
     public string avatar;
     public bool isOnline;
 
-    public List<FriendRequest> sentFriendRequests;
-    public List<FriendRequest> receivedFriendRequests;
+    public List<FriendRequestModel> sentFriendRequests;
+    public List<FriendRequestModel> receivedFriendRequests;
 }
 
-public struct FriendRequest
+[Serializable]
+public struct FriendRequestModel
 {
     public string id;
     public string requester;
@@ -29,13 +31,13 @@ public struct FriendRequest
 
 public struct UserFailRequest
 {
-    string message;
+    public string message;
 }
 
 
 public static partial class CustomHTTP
 {
-    public static async void Profile(string url, object data, Action<UserSuccessRequest> result, Action<UserFailRequest> error)
+    public static async void Profile(string url, Action<UserDataModel> result, Action<UserFailRequest> error)
     {
         var response = await GET(url);
 
@@ -46,6 +48,6 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<UserFailRequest>(content));
         else
-            result.Invoke(JsonUtility.FromJson<UserSuccessRequest>(content));
+            result.Invoke(JsonUtility.FromJson<UserDataModel>(content));
     }
 }

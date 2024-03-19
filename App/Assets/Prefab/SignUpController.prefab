@@ -477,7 +477,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1668493569181695760}
   m_Layer: 5
-  m_Name: SignUp
+  m_Name: SignUpController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

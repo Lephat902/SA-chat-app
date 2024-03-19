@@ -1,4 +1,5 @@
 
+
   
 
 <p  align="center">
@@ -22,6 +23,10 @@
 # Websockets chat
 
 A real-time chat application built with NestJS, leveraging WebSocket for real-time bi-directional communication.
+
+## Source Repository
+
+This project is based on the NestJS Websockets Chat Boilerplate originally created by [vkondratiuk482](https://github.com/vkondratiuk482). You can find the original repository [here](https://github.com/vkondratiuk482/nest-websockets-chat-boilerplate).
 
 ## Table of Contents  
 - [Overview](#overview) 
@@ -98,9 +103,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 }
 ```
 
+**Old Approach**:
+~~For the entire socket gateway, we don’t allow clients to make changes through it. Instead, they make changes via the traditional HTTP REST API. We handle the events on the gateway and send them back to connected clients.~~
 
-For the entire socket gateway, we don’t allow clients to make changes through it. Instead, they make changes via the traditional HTTP REST API. We handle the events on the gateway and send them back to connected clients.
-
+**Revised Approach**:
+In this updated approach, the socket gateway enables direct communication between clients, significantly enhancing efficiency for chat-related operations like adding messages or marking them as read. By reducing the number of HTTP connections opened for each message, we achieve streamlined performance. However, for other system operations, changes still occur via the HTTP REST API, with notifications sent back to interested clients via Websocket.
 ## Features
 - PassportJS/JWT auth
 

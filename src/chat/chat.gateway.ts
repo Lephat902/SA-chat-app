@@ -9,7 +9,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/services';
 import { AuthService } from 'src/auth/auth.service';
-import { SocketUserMap } from './user-socket.map';
+import { UserSocketsMap } from './user-sockets.map';
 import { OnEvent } from '@nestjs/event-emitter';
 import {
   USER_ADDED_TO_GROUP_EVENT,
@@ -26,11 +26,16 @@ import {
   OnlineStatusUpdatedEvent,
   ConversationMessageAddedEvent,
   CONVERSATION_MESSAGE_ADDED,
+  FRIEND_REQUEST_CREATED_EVENT,
+  FriendRequestCreatedEvent,
+  FRIEND_REQUEST_UPDATED_EVENT,
+  FriendRequestUpdatedEvent,
 } from 'src/events';
 import { FriendService } from 'src/friend/services';
 import { AsyncApiPub, AsyncApiSub } from 'nestjs-asyncapi';
 import { AddMessageDto, MarkMessageAsReadDto } from 'src/message/dtos';
 import { MessageService } from 'src/message/services';
+import { RequestStatus } from 'src/friend-request/entities';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -46,8 +51,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
 
-  // socket-client-id <-> system-user-id
-  private readonly socketUserMap: SocketUserMap = new SocketUserMap();
+  // system-user-id <-> [socket-client-id]
+  private readonly userSocketsMap: UserSocketsMap = new UserSocketsMap();
 
   constructor(
     private readonly userService: UserService,
@@ -68,21 +73,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    this.socketUserMap.addConnection(client.id, user.id);
+    this.userSocketsMap.addConnection(client.id, user.id);
 
     const conversations = user?.conversations;
     if (conversations) {
       await client.join(conversations.map(conversation => conversation.id));
     }
-    const newNumberOfSocketConnections = this.socketUserMap.getNumOfClientsByUserId(user.id);
+    const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(user.id);
     if (newNumberOfSocketConnections === 1)
       await this.userService.updateOnlineStatus(user.id, true);
   }
 
   async handleDisconnect(client: Socket) {
-    const userId = this.socketUserMap.getUserIdByClientId(client.id);
-    this.socketUserMap.removeConnection(client.id);
-    const newNumberOfSocketConnections = this.socketUserMap.getNumOfClientsByUserId(userId);
+    const userId = this.userSocketsMap.getUserIdByClientId(client.id);
+    this.userSocketsMap.removeConnection(client.id);
+    const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(userId);
     if (newNumberOfSocketConnections === 0)
       await this.userService.updateOnlineStatus(userId, false);
   }
@@ -92,10 +97,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: AddMessageDto
     },
+    description: 'Publishes a message to be sent to a conversation.'
   })
   @SubscribeMessage('send-message')
   async addMessage(client: Socket, addMessageDto: AddMessageDto) {
-    const userId = this.socketUserMap.getUserIdByClientId(client.id);
+    const userId = this.userSocketsMap.getUserIdByClientId(client.id);
     addMessageDto.userId = userId;
     await this.messageService.addMessage(addMessageDto);
   }
@@ -105,6 +111,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: ConversationMessageAddedEvent
     },
+    description: 'Subscribes to receive messages sent to a conversation involving YOU.'
   })
   @OnEvent(CONVERSATION_MESSAGE_ADDED)
   async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
@@ -117,11 +124,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: MarkMessageAsReadDto
     },
+    description: 'Publishes an event to notify everyone in the conversation that you have read a message.'
   })
   @SubscribeMessage('mark-as-read')
   async markMessageAsRead(client: Socket, markMessageAsReadDto: MarkMessageAsReadDto) {
     // Prepare
-    const userId = this.socketUserMap.getUserIdByClientId(client.id);
+    const userId = this.userSocketsMap.getUserIdByClientId(client.id);
     markMessageAsReadDto.userId = userId;
     // Save changes
     await this.messageService.markAsLastRead(markMessageAsReadDto);
@@ -132,6 +140,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: LastReadMessageUpdatedEvent
     },
+    description: 'Subscribes to receive events when the last read message of a person in YOUR conversation is updated.'
   })
   @OnEvent(LAST_READ_MESSAGE_UPDATED_EVENT)
   async handleLastReadMessageUpdatedEvent(event: LastReadMessageUpdatedEvent) {
@@ -144,13 +153,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: OnlineStatusUpdatedEvent
     },
+    description: 'Subscribes to receive events when a FRIEND\'s online status is updated.'
   })
   @OnEvent(ONLINE_STATUS_UPDATED_EVENT)
   async handleOnlineStatusUpdatedEvent(event: OnlineStatusUpdatedEvent) {
     const { userId } = event;
     const friendsList = await this.friendService.getFriends(userId);
     friendsList.forEach(friend => {
-      const clients = this.socketUserMap.getSocketClientsByUserId(this.server, friend.id);
+      const clients = this.userSocketsMap.getSocketClientsByUserId(this.server, friend.id);
       clients.forEach(client => client.emit('is-online', event));
     })
   }
@@ -160,11 +170,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: UserAddedToGroupEvent
     },
+    description: 'Subscribes to receive events when a user joins a group conversation involving YOU.'
   })
   @OnEvent(USER_ADDED_TO_GROUP_EVENT)
   async handleUserAddedToGroupEvent(event: UserAddedToGroupEvent) {
     const { userId, conversationId } = event;
-    const clients = this.socketUserMap.getSocketClientsByUserId(this.server, userId);
+    const clients = this.userSocketsMap.getSocketClientsByUserId(this.server, userId);
     await Promise.allSettled(clients.map(client => client.join(conversationId)));
     this.server.to(conversationId).emit('join', event);
   }
@@ -174,11 +185,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: UserRemovedFromGroupEvent
     },
+    description: 'Subscribes to receive events when a user leaves a group conversation involving YOU.'
   })
   @OnEvent(USER_REMOVED_FROM_GROUP_EVENT)
   async handleUserRemovedFromGroupEvent(event: UserRemovedFromGroupEvent) {
     const { conversationId, userId } = event;
-    const clients = this.socketUserMap.getSocketClientsByUserId(this.server, userId);
+    const clients = this.userSocketsMap.getSocketClientsByUserId(this.server, userId);
     await Promise.allSettled(clients.map(client => client.leave(conversationId)));
     this.server.to(conversationId).emit('leave', event);
   }
@@ -188,12 +200,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: ConversationCreatedEvent
     },
+    description: 'Subscribes to receive events when a conversation involving YOU is created.'
   })
   @OnEvent(CONVERSATION_CREATED_EVENT)
   async handleConversationCreatedEvent(event: ConversationCreatedEvent) {
     const { conversationId, membersIdsList } = event;
     const usersClients = membersIdsList.map(memberId =>
-      this.socketUserMap.getSocketClientsByUserId(this.server, memberId)
+      this.userSocketsMap.getSocketClientsByUserId(this.server, memberId)
     );
 
     await Promise.allSettled(usersClients.map(clients =>
@@ -208,18 +221,49 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     message: {
       payload: ConversationDeletedEvent
     },
+    description: 'Subscribes to receive events when one of YOUR conversation is deleted.'
   })
   @OnEvent(CONVERSATION_DELETED_EVENT)
   async handleConversationDeletedEvent(event: ConversationDeletedEvent) {
     const { conversationId, membersIdsList } = event;
     const usersClients = membersIdsList.map(memberId =>
-      this.socketUserMap.getSocketClientsByUserId(this.server, memberId)
+      this.userSocketsMap.getSocketClientsByUserId(this.server, memberId)
     );
+
+    // Emit event before leaving conversation
+    this.server.to(conversationId).emit('conversation-deleted', event);
 
     await Promise.allSettled(usersClients.map(clients =>
       Promise.allSettled(clients.map(client => client.leave(conversationId)))
     ));
+  }
 
-    this.server.to(conversationId).emit('conversation-deleted', event);
+  @AsyncApiSub({
+    channel: 'friend-request-sent',
+    message: {
+      payload: FriendRequestCreatedEvent
+    },
+    description: 'Subscribes to receive events when a friend request is sent.'
+  })
+  @OnEvent(FRIEND_REQUEST_CREATED_EVENT)
+  async handleFriendRequestCreatedEvent(event: FriendRequestCreatedEvent) {
+    const { recipientId } = event;
+    const recipientClient = this.userSocketsMap.getSocketClientsByUserId(this.server, recipientId);
+    recipientClient.forEach(client => client.emit('friend-request-sent', event));
+  }
+
+  @AsyncApiSub({
+    channel: 'friend-request-updated',
+    message: {
+      payload: FriendRequestUpdatedEvent
+    },
+    description: 'Subscribes to receive events when the status of a friend request is updated.'
+  })
+  @OnEvent(FRIEND_REQUEST_UPDATED_EVENT)
+  async handleFriendRequestUpdatedEvent(event: FriendRequestUpdatedEvent) {
+    const { requesterId, recipientId, newStatus } = event;
+    const userIdToNotify = newStatus === RequestStatus.CANCELLED ? recipientId : requesterId;
+    const clients = this.userSocketsMap.getSocketClientsByUserId(this.server, userIdToNotify);
+    clients.forEach(client => client.emit('friend-request-updated', event));
   }
 }

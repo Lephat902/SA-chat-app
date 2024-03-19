@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 
-export class SocketUserMap {
+export class UserSocketsMap {
     // Maps socket client ID to system user ID
     clientIdToUserId: Map<string, string> = new Map();
 

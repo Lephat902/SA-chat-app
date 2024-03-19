@@ -16,7 +16,12 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
 
         if (exception instanceof HttpException) {
             console.log('HTTP EXCEPTION', exception);
-            response.status(exception.getStatus()).json(exception.getResponse());
+            const responseObj: any = exception.getResponse();
+            // Check if the message field is a string and convert it to an array
+            if (responseObj instanceof Object && typeof responseObj.message === 'string') {
+                responseObj.message = [responseObj.message];
+            }
+            response.status(exception.getStatus()).json(responseObj);
             return;
         }
 

@@ -4,6 +4,7 @@ import { UserModule } from 'src/user/user.module';
 import { AuthModule } from 'src/auth/auth.module';
 import { ConversationModule } from 'src/conversation/conversation.module';
 import { FriendModule } from 'src/friend/friend.module';
+import { MessageModule } from 'src/message/message.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { FriendModule } from 'src/friend/friend.module';
     AuthModule,
     ConversationModule,
     FriendModule,
+    MessageModule,
   ],
   providers: [ChatGateway],
 })

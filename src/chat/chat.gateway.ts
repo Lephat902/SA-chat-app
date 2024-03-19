@@ -16,8 +16,6 @@ import {
   USER_REMOVED_FROM_GROUP_EVENT,
   UserAddedToGroupEvent,
   UserRemovedFromGroupEvent,
-  CONVERSATION_MESSAGE_ADDED,
-  ConversationMessageAddedEvent,
   CONVERSATION_CREATED_EVENT,
   ConversationCreatedEvent,
   CONVERSATION_DELETED_EVENT,
@@ -26,9 +24,13 @@ import {
   LastReadMessageUpdatedEvent,
   ONLINE_STATUS_UPDATED_EVENT,
   OnlineStatusUpdatedEvent,
+  ConversationMessageAddedEvent,
+  CONVERSATION_MESSAGE_ADDED,
 } from 'src/events';
 import { FriendService } from 'src/friend/services';
-import { AsyncApiSub } from 'nestjs-asyncapi';
+import { AsyncApiPub, AsyncApiSub } from 'nestjs-asyncapi';
+import { AddMessageDto, MarkMessageAsReadDto } from 'src/message/dtos';
+import { MessageService } from 'src/message/services';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -51,6 +53,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly userService: UserService,
     private readonly authService: AuthService,
     private readonly friendService: FriendService,
+    private readonly messageService: MessageService,
   ) { }
 
   async handleConnection(client: Socket): Promise<void> {
@@ -84,10 +87,56 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.userService.updateOnlineStatus(userId, false);
   }
 
-  @SubscribeMessage('friendsOnlineStatus')
-  async getFriendsOnlineStatus(client: Socket, data: unknown) {
+  @AsyncApiPub({
+    channel: 'send-message',
+    message: {
+      payload: AddMessageDto
+    },
+  })
+  @SubscribeMessage('send-message')
+  async addMessage(client: Socket, addMessageDto: AddMessageDto) {
     const userId = this.socketUserMap.getUserIdByClientId(client.id);
-    client.emit('friendsOnlineStatus', await this.friendService.findFriendsOnlineStatus(userId));
+    addMessageDto.userId = userId;
+    await this.messageService.addMessage(addMessageDto);
+  }
+
+  @AsyncApiSub({
+    channel: 'receive-message',
+    message: {
+      payload: ConversationMessageAddedEvent
+    },
+  })
+  @OnEvent(CONVERSATION_MESSAGE_ADDED)
+  async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
+    const { conversationId } = event;
+    this.server.to(conversationId).emit('receive-message', event);
+  }
+
+  @AsyncApiPub({
+    channel: 'mark-as-read',
+    message: {
+      payload: MarkMessageAsReadDto
+    },
+  })
+  @SubscribeMessage('mark-as-read')
+  async markMessageAsRead(client: Socket, markMessageAsReadDto: MarkMessageAsReadDto) {
+    // Prepare
+    const userId = this.socketUserMap.getUserIdByClientId(client.id);
+    markMessageAsReadDto.userId = userId;
+    // Save changes
+    await this.messageService.markAsLastRead(markMessageAsReadDto);
+  }
+
+  @AsyncApiSub({
+    channel: 'last-read-message-updated',
+    message: {
+      payload: LastReadMessageUpdatedEvent
+    },
+  })
+  @OnEvent(LAST_READ_MESSAGE_UPDATED_EVENT)
+  async handleLastReadMessageUpdatedEvent(event: LastReadMessageUpdatedEvent) {
+    const { conversationId } = event;
+    this.server.to(conversationId).emit('last-read-message-updated', event);
   }
 
   @AsyncApiSub({
@@ -104,18 +153,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const clients = this.socketUserMap.getSocketClientsByUserId(this.server, friend.id);
       clients.forEach(client => client.emit('is-online', event));
     })
-  }
-
-  @AsyncApiSub({
-    channel: 'message',
-    message: {
-      payload: ConversationMessageAddedEvent
-    },
-  })
-  @OnEvent(CONVERSATION_MESSAGE_ADDED)
-  async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
-    const { conversationId } = event;
-    this.server.to(conversationId).emit('message', event);
   }
 
   @AsyncApiSub({
@@ -184,17 +221,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ));
 
     this.server.to(conversationId).emit('conversation-deleted', event);
-  }
-
-  @AsyncApiSub({
-    channel: 'last-read-message-updated',
-    message: {
-      payload: LastReadMessageUpdatedEvent
-    },
-  })
-  @OnEvent(LAST_READ_MESSAGE_UPDATED_EVENT)
-  async handleLastReadMessageUpdatedEvent(event: LastReadMessageUpdatedEvent) {
-    const { conversationId } = event;
-    this.server.to(conversationId).emit('last-read-message-updated', event);
   }
 }

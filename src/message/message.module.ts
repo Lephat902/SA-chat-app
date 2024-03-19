@@ -15,5 +15,6 @@ import { UserConversationListener } from './listeners';
   ],
   controllers: [MessageController],
   providers: [MessageService, UserConversationListener],
+  exports: [MessageService],
 })
 export class MessageModule { }

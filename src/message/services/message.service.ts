@@ -7,7 +7,7 @@ import { isObjectWithIdExist } from 'src/helpers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CONVERSATION_MESSAGE_ADDED, ConversationMessageAddedEvent, LAST_READ_MESSAGE_UPDATED_EVENT, LastReadMessageUpdatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
-import { AddMessageDto, MessageQueryDto } from '../dtos';
+import { AddMessageDto, MarkMessageAsReadDto, MessageQueryDto } from '../dtos';
 import { UserConversation } from '../entities';
 import { ConversationService } from 'src/conversation/services';
 import { User } from 'src/user/entities';
@@ -35,7 +35,8 @@ export class MessageService {
     this.emitConversationMessageAddedEvent(newMessage);
   }
 
-  async markAsLastRead(userId: string, messageId: string) {
+  async markAsLastRead(markMessageAsReadDto: MarkMessageAsReadDto) {
+    const { messageId, userId } = markMessageAsReadDto;
     const message = await this.findMessageWithConversation(messageId);
     const userConversation = await this.findOrInsertUserConversation(userId, message.conversation.id);
 

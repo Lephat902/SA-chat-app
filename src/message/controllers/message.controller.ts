@@ -1,16 +1,13 @@
 import {
-  Body,
   Controller,
   ForbiddenException,
   Get,
   Param,
-  Post,
-  Put,
   Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { AddMessageDto, MessageQueryDto } from '../dtos';
+import { MessageQueryDto } from '../dtos';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MessageService } from '../services';
@@ -25,28 +22,6 @@ export class MessageController {
     private readonly messageService: MessageService,
     private readonly conversationService: ConversationService,
   ) { }
-
-  @UseGuards(JwtAuthGuard)
-  @Post('/:id/messages')
-  async addMessage(
-    @Param('id') id: string,
-    @Body() addMessageDto: AddMessageDto,
-    @Req() req: RequestWithUser,
-  ) {
-    addMessageDto.userId = req.user.id;
-    addMessageDto.conversationId = id;
-    return this.messageService.addMessage(addMessageDto);
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Put('/messages/:messageId/mark-as-read')
-  async markMessageAsRead(
-    @Param('messageId') messageId: string,
-    @Req() req: RequestWithUser,
-  ) {
-    const userIdMakeRequest = req.user.id;
-    return this.messageService.markAsLastRead(userIdMakeRequest, messageId);
-  }
 
   @UseGuards(JwtAuthGuard)
   @Get('/:id/messages')

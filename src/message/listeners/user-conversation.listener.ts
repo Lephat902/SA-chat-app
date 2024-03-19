@@ -31,6 +31,9 @@ export class UserConversationListener {
     @OnEvent(CONVERSATION_MESSAGE_ADDED)
     async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
         const { userId, id } = event;
-        await this.messageService.markAsLastRead(userId, id);
+        await this.messageService.markAsLastRead({
+            userId,
+            messageId: id,
+        });
     }
 }

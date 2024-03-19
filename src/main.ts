@@ -29,8 +29,10 @@ async function bootstrap() {
       // Define the regular expression pattern for localhost
       const localhostPattern = /^https?:\/\/localhost(?::\d+)?$/; // Match http://localhost[:port_number]
 
-      // Use RegExp.test() to match the patterns
-      if (localhostPattern.test(origin)) {
+      if (
+        localhostPattern.test(origin)
+        || origin === configService.get<string>('APP_DOMAIN')
+      ) {
         callback(null, true);
       } else {
         callback(new InternalServerErrorException('Not allowed by CORS'));

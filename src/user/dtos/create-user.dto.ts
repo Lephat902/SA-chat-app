@@ -18,16 +18,23 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'User password',
-    example: 'password',
+    example: 'password123',
     required: true,
   })
   @IsNotEmpty()
   @IsString()
-  @MinLength(5)
+  @MinLength(5, {
+    message: 'Password must be at least 5 characters long',
+  })
   readonly password: string;
 
+  @ApiProperty({
+    description: 'URL of the user avatar image',
+    example: 'https://i.pravatar.cc/300',
+    required: false,
+  })
   @IsOptional()
   @IsString()
   @IsUrl()
-  readonly avatar: string;
+  readonly avatar?: string;
 }

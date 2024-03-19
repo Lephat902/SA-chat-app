@@ -13,7 +13,7 @@ export class MessageQueryDto {
   @Max(20)
   @Type(() => Number)
   @ApiProperty({
-    description: 'Limit, default is 10',
+    description: 'Limit, default is 10, 20 at max',
     required: false,
   })
   readonly limit: number = 10;

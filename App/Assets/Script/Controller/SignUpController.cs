@@ -59,7 +59,7 @@ public class SignUpController : MonoBehaviour
             {
                 userDataAsset.AccessToken = res.accessToken;
                 statusText.text = "Sign Up success!";
-                StartHome();
+                StartHome(signUpUserName.text);
             },
             (err) => { statusText.text = err.message[0]; });
     }
@@ -84,7 +84,7 @@ public class SignUpController : MonoBehaviour
             {
                 userDataAsset.AccessToken = res.accessToken;
                 statusText.text = "Sign In success!";
-                StartHome();
+                StartHome(signInUserName.text);
             },
             (err) => { statusText.text = err.message[0]; });
     }
@@ -98,7 +98,15 @@ public class SignUpController : MonoBehaviour
 
     private void ClearStatus() => statusText.text = string.Empty;
 
-    private void StartHome() {
-        SceneManager.LoadScene("Home", LoadSceneMode.Single);
+    private void StartHome(string userName) {
+        CustomHTTP.Profile(CustomHTTP.DOMAIN + $"/users/username/{userName}/profile",
+            (res) =>
+            {
+                userDataAsset.AccessToken = res.accessToken;
+                userDataAsset.UserDataModel = res;
+                statusText.text = "Loading to Home!";
+                SceneManager.LoadScene("Home", LoadSceneMode.Single);
+            },
+            (err) => { statusText.text = err.message; });
     }
 }

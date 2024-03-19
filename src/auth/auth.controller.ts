@@ -13,7 +13,7 @@ import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto, LoginUserDto } from 'src/user/dtos';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
 import { UserService } from 'src/user/services';
@@ -29,26 +29,20 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @Get('/profile')
   @ApiBearerAuth()
-  async getProfile(
-    @Req() req: RequestWithUser,
-  ) {
+  @ApiOperation({ summary: 'Get user profile', description: 'Retrieves the profile of the currently authenticated user.' })
+  @ApiResponse({ status: 200, description: 'Profile retrieved successfully.' })
+  async getProfile(@Req() req: RequestWithUser) {
     const userId = req.user.id;
     return this.userService.findOneById(userId);
   }
 
   @Post('/signUp')
-  async signUp(
-    @Body() userDto: CreateUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  @ApiOperation({ summary: 'User sign up', description: 'Registers a new user and returns tokens.' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({ status: 201, description: 'User registered successfully.' })
+  @ApiResponse({ status: 400, description: 'Bad request, user under this username already exists.' })
+  async signUp(@Body() userDto: CreateUserDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.signUp(userDto);
-
-    if (!tokens) {
-      throw new HttpException(
-        'User under this username already exists',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
 
     res.cookie('refreshToken', tokens.refreshToken, {
       httpOnly: true,
@@ -60,10 +54,10 @@ export class AuthController {
 
   @Post('/signIn')
   @UseGuards(LocalAuthGuard)
-  async signIn(
-    @Body() userDto: LoginUserDto,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  @ApiOperation({ summary: 'User sign in', description: 'Authenticates a user and returns tokens.' })
+  @ApiBody({ type: LoginUserDto })
+  @ApiResponse({ status: 200, description: 'User authenticated successfully.' })
+  async signIn(@Body() userDto: LoginUserDto, @Res({ passthrough: true }) res: Response) {
     const tokens = await this.authService.signIn(userDto);
 
     res.cookie('refreshToken', tokens.refreshToken, {
@@ -75,6 +69,9 @@ export class AuthController {
   }
 
   @Post('tokens/update')
+  @ApiOperation({ summary: 'Update access token', description: 'Refreshes the access token using the refresh token.' })
+  @ApiResponse({ status: 200, description: 'Access token updated successfully.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized, invalid refresh token.' })
   async updateTokens(@Req() req: Request) {
     const { refreshToken } = req.cookies;
 

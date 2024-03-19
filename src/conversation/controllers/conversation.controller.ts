@@ -1,16 +1,8 @@
-import {
-  Controller,
-  Delete,
-  ForbiddenException,
-  Get,
-  Param,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Delete, ForbiddenException, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
 import { ConversationService } from '../services/conversation.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { Conversation } from '../entities';
 
 @Controller('conversations')
@@ -21,7 +13,8 @@ export class ConversationController {
 
   @UseGuards(JwtAuthGuard)
   @Get()
-  @ApiOperation({ description: "User gets all his/her conversations if any." })
+  @ApiOperation({ summary: 'Get all user conversations', description: 'Retrieves all conversations belonging to the authenticated user.' })
+  @ApiResponse({ status: 200, description: 'Conversations retrieved successfully', type: [Conversation] })
   async findMyConversations(@Req() req: RequestWithUser) {
     const userIdMakeRequest = req.user.id;
     return this.conversationService.findAllConversations(userIdMakeRequest);
@@ -29,7 +22,10 @@ export class ConversationController {
 
   @UseGuards(JwtAuthGuard)
   @Get(':id')
-  @ApiOperation({ description: "User gets details of a conversation." })
+  @ApiOperation({ summary: 'Get details of a conversation', description: 'Retrieves details of a conversation by its ID.' })
+  @ApiParam({ name: 'id', description: 'The ID of the conversation' })
+  @ApiResponse({ status: 200, description: 'Conversation details retrieved successfully', type: Conversation })
+  @ApiResponse({ status: 403, description: 'Forbidden access. User is not a member of the conversation.' })
   async findOne(
     @Param('id') id: string,
     @Req() req: RequestWithUser,
@@ -45,6 +41,9 @@ export class ConversationController {
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
+  @ApiOperation({ summary: 'Delete a conversation', description: 'Deletes a conversation by its ID.' })
+  @ApiParam({ name: 'id', description: 'The ID of the conversation' })
+  @ApiResponse({ status: 200, description: 'Conversation deleted successfully' })
   async remove(
     @Param('id') id: string,
     @Req() req: RequestWithUser,

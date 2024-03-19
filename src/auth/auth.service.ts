@@ -1,15 +1,11 @@
 import {
   Injectable,
   UnauthorizedException,
-  NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-
 import * as bcrypt from 'bcryptjs';
-
 import { UserService } from 'src/user/services';
-
 import { User } from 'src/user/entities';
 import { CreateUserDto } from 'src/user/dtos';
 import { LoginUserDto } from 'src/user/dtos/login-user.dto';
@@ -19,7 +15,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-  ) {}
+  ) { }
 
   async signUp(userDto: CreateUserDto) {
     const candidate = await this.userService.findOneByUsername(
@@ -52,18 +48,11 @@ export class AuthService {
   async validateUser(userDto: LoginUserDto): Promise<User> {
     const user = await this.userService.findOneByUsername(userDto.username);
 
-    if (!user) {
-      throw new NotFoundException(`There is no user under this username`);
+    if (!user || !(await bcrypt.compare(userDto.password, user.password))) {
+      throw new UnauthorizedException('Invalid credentials');
     }
 
-    const passwordEquals = await bcrypt.compare(
-      userDto.password,
-      user.password,
-    );
-
-    if (passwordEquals) return user;
-
-    throw new UnauthorizedException({ message: 'Incorrect password' });
+    return user;
   }
 
   verifyAccessToken(accessToken: string) {

@@ -30,7 +30,7 @@ export class CreateUserDto {
 
   @ApiProperty({
     description: 'URL of the user avatar image',
-    example: 'https://i.pravatar.cc/300',
+    example: 'https://robohash.org/example.png',
     required: false,
   })
   @IsOptional()

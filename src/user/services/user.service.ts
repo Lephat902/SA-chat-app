@@ -61,6 +61,7 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create({
       ...createUserDto,
+      ...(!createUserDto.avatar && { avatar: `https://robohash.org/${createUserDto.username}.png` })
     });
 
     return this.userRepository.save(user);

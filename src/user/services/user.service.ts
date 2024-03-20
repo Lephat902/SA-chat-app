@@ -33,11 +33,7 @@ export class UserService {
     const skip = (page - 1) * limit;
     queryBuilder.skip(skip).take(limit);
 
-    const [totalCount, results] = await Promise.all([
-      queryBuilder.getCount(),
-      queryBuilder.getMany(),
-    ]);
-
+    const [results, totalCount] = await queryBuilder.getManyAndCount();
     return { results, totalCount };
   }
 

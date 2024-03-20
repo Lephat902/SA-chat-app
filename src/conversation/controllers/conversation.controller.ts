@@ -1,4 +1,4 @@
-import { Controller, Delete, ForbiddenException, Get, Param, Req, UseGuards } from '@nestjs/common';
+import { Controller, ForbiddenException, Get, Param, Req, UseGuards } from '@nestjs/common';
 import { RequestWithUser } from '../../common';
 import { ConversationService } from '../services/conversation.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
@@ -31,24 +31,11 @@ export class ConversationController {
     @Req() req: RequestWithUser,
   ): Promise<Conversation> {
     const userIdMakeRequest = req.user.id;
-    const conversation = await this.conversationService.findOne(id, true);
+    const conversation = await this.conversationService.findOneWithUsersById(id);
     if (!this.conversationService.isMemberOfConversation(conversation, userIdMakeRequest)) {
       throw new ForbiddenException("You aren't allowed to access this conversation");
     }
 
     return conversation;
-  }
-
-  @UseGuards(JwtAuthGuard)
-  @Delete(':id')
-  @ApiOperation({ summary: 'Delete a conversation', description: 'Deletes a conversation by its ID.' })
-  @ApiParam({ name: 'id', description: 'The ID of the conversation' })
-  @ApiResponse({ status: 200, description: 'Conversation deleted successfully' })
-  async remove(
-    @Param('id') id: string,
-    @Req() req: RequestWithUser,
-  ) {
-    const userIdMakeRequest = req.user.id;
-    return this.conversationService.remove(id, userIdMakeRequest);
   }
 }

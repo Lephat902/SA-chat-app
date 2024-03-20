@@ -6,7 +6,9 @@ import { Conversation } from '../entities/conversation.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
   CONVERSATION_CREATED_EVENT,
+  CONVERSATION_DELETED_EVENT,
   ConversationCreatedEvent,
+  ConversationDeletedEvent,
   USER_ADDED_TO_GROUP_EVENT,
   USER_REMOVED_FROM_GROUP_EVENT,
   UserAddedToGroupEvent,
@@ -61,6 +63,27 @@ export class GroupConversationService {
     );
   }
 
+  async removeGroupConversation(id: string, userIdMakeRequest: string) {
+    const conversation = await this.findGroupWithUsersById(id);
+
+    if (!conversation) {
+      throw new NotFoundException(`Group conversation ${id} not found`);
+    }
+
+    this.checkGroupAdminPermission(conversation, userIdMakeRequest);
+
+    await this.conversationRepository.delete({ id });
+
+    const membersIdsList = conversation.users.map(user => user.id);
+    this.eventEmitter.emit(
+      CONVERSATION_DELETED_EVENT,
+      Builder<ConversationDeletedEvent>()
+        .conversationId(id)
+        .membersIdsList(membersIdsList)
+        .build()
+    );
+  }
+
   async updateGroupConversation(id: string, adminId: string, updateGroupConversationDto: UpdateGroupConversationDto) {
     const conversation = await this.groupConversationRepository.preload({
       id,
@@ -71,21 +94,21 @@ export class GroupConversationService {
       throw new NotFoundException(`There is no conversation under id ${id}`);
     }
 
-    this.conversationService.checkConversationManipulationPermission(conversation, adminId);
+    this.checkGroupAdminPermission(conversation, adminId);
 
     return this.groupConversationRepository.save(conversation);
   }
 
-  async addToGroup(userIdMakeRequest: string, userId: string, conversationId: string) {
+  async addToGroup(userIdMakeRequest: string, userIdToAdd: string, conversationId: string) {
     const [user, conversation] = await Promise.all([
-      this.userService.findOneById(userId, true),
-      this.conversationService.findOne(conversationId, true),
+      this.userService.findOneById(userIdToAdd, true),
+      this.findGroupWithUsersById(conversationId),
     ])
 
-    this.conversationService.checkConversationManipulationPermission(conversation, userIdMakeRequest);
+    this.checkGroupAdminPermission(conversation, userIdMakeRequest);
 
-    if (this.conversationService.isMemberOfConversation(conversation, userId)) {
-      throw new BadRequestException(`User ${userId} is already in group`);
+    if (this.conversationService.isMemberOfConversation(conversation, userIdToAdd)) {
+      throw new BadRequestException(`User ${userIdToAdd} is already in group`);
     }
 
     conversation.users.push(user);
@@ -94,31 +117,31 @@ export class GroupConversationService {
     this.eventEmitter.emit(
       USER_ADDED_TO_GROUP_EVENT,
       Builder<UserAddedToGroupEvent>()
-        .userId(userId)
+        .userId(userIdToAdd)
         .conversationId(conversationId)
         .build()
     );
   }
 
-  async deleteFromGroup(userIdMakeRequest: string, userId: string, conversationId: string) {
-    if (userId === userIdMakeRequest) {
+  async deleteFromGroup(userIdMakeRequest: string, userIdToDelete: string, conversationId: string) {
+    if (userIdToDelete === userIdMakeRequest) {
       throw new BadRequestException("You cannot delete yourself");
     }
-    
-    const conversation = await this.conversationService.findOne(conversationId, true);
-    this.conversationService.checkConversationManipulationPermission(conversation, userIdMakeRequest);
 
-    if (!this.conversationService.isMemberOfConversation(conversation, userId)) {
-      throw new BadRequestException(`User ${userId} is not in group`);
+    const conversation = await this.findGroupWithUsersById(conversationId);
+    this.checkGroupAdminPermission(conversation, userIdMakeRequest);
+
+    if (!this.conversationService.isMemberOfConversation(conversation, userIdToDelete)) {
+      throw new BadRequestException(`User ${userIdToDelete} is not in group`);
     }
 
-    conversation.users = conversation.users.filter(user => user.id !== userId);
+    conversation.users = conversation.users.filter(user => user.id !== userIdToDelete);
     await this.conversationRepository.save(conversation);
 
     this.eventEmitter.emit(
       USER_REMOVED_FROM_GROUP_EVENT,
       Builder<UserRemovedFromGroupEvent>()
-        .userId(userId)
+        .userId(userIdToDelete)
         .conversationId(conversationId)
         .isKicked(true)
         .build()
@@ -126,13 +149,13 @@ export class GroupConversationService {
   }
 
   async leaveGroup(userIdMakeRequest: string, conversationId: string) {
-    const conversation = await this.conversationService.findOne(conversationId, true);
+    const conversation = await this.findGroupWithUsersById(conversationId);
 
+    if (conversation.adminId === userIdMakeRequest) {
+      throw new BadRequestException("Admin cannot leave the group");
+    }
     if (!this.conversationService.isMemberOfConversation(conversation, userIdMakeRequest)) {
       throw new BadRequestException("You aren't member of this group");
-    }
-    if ((conversation as GroupConversation)?.adminId === userIdMakeRequest) {
-      throw new BadRequestException("Admin cannot leave the group");
     }
 
     conversation.users = conversation.users.filter(user => user.id !== userIdMakeRequest);
@@ -148,11 +171,30 @@ export class GroupConversationService {
     );
   }
 
-  async getMembers(userIdMakeRequest: string, conversationId: string) {
-    const conversation = await this.conversationService.findOne(conversationId, true);
+  async getMembersOfGroupConversation(userIdMakeRequest: string, conversationId: string) {
+    const conversation = await this.findGroupWithUsersById(conversationId);
     if (!this.conversationService.isMemberOfConversation(conversation, userIdMakeRequest)) {
       throw new ForbiddenException("You cannot see members of this group");
     }
     return conversation.users;
+  }
+
+  private async findGroupWithUsersById(id: string): Promise<GroupConversation> {
+    const conversation = await this.groupConversationRepository.findOne({
+      where: { id },
+      relations: ['users'],
+    });
+
+    if (!conversation) {
+      throw new NotFoundException(`Group conversation ${id} not found`);
+    }
+
+    return conversation;
+  }
+
+  private checkGroupAdminPermission(groupConversation: GroupConversation, userIdMakeRequest: string) {
+    if (userIdMakeRequest !== groupConversation.adminId) {
+      throw new ForbiddenException("You are not admin of this group");
+    }
   }
 }

@@ -24,6 +24,19 @@ export class GroupConversationController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a group conversation', description: 'Deletes a group conversation by its ID.' })
+  @ApiParam({ name: 'id', description: 'The ID of the group conversation' })
+  @ApiResponse({ status: 200, description: 'Group conversation deleted successfully' })
+  async remove(
+    @Param('id') id: string,
+    @Req() req: RequestWithUser,
+  ) {
+    const userIdMakeRequest = req.user.id;
+    return this.groupConversationService.removeGroupConversation(id, userIdMakeRequest);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('/:id')
   @ApiOperation({ summary: 'Update a group conversation', description: 'Updates an existing group conversation.' })
   @ApiParam({ name: 'id', description: 'The ID of the group conversation to update' })
@@ -90,6 +103,6 @@ export class GroupConversationController {
     @Req() req: RequestWithUser,
   ) {
     const userIdMakeRequest = req.user.id;
-    return this.groupConversationService.getMembers(userIdMakeRequest, conversationId);
+    return this.groupConversationService.getMembersOfGroupConversation(userIdMakeRequest, conversationId);
   }
 }

@@ -1,12 +1,12 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UserService } from 'src/user/services';
 import { Conversation } from '../entities/conversation.entity';
-import { DirectConversation, GroupConversation } from '../entities';
+import { DirectConversation } from '../entities';
 import { isObjectWithIdExist } from 'src/helpers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { CONVERSATION_CREATED_EVENT, CONVERSATION_DELETED_EVENT, ConversationCreatedEvent, ConversationDeletedEvent } from 'src/events';
+import { CONVERSATION_CREATED_EVENT, ConversationCreatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
 
 @Injectable()
@@ -20,10 +20,10 @@ export class ConversationService {
     private readonly eventEmitter: EventEmitter2,
   ) { }
 
-  async findOne(id: string, withUsers: boolean = false) {
+  async findOneWithUsersById(id: string) {
     const conversation = await this.conversationRepository.findOne({
       where: { id },
-      ...(withUsers && { relations: ['users'] }),
+      relations: ['users'],
     });
 
     if (!conversation) {
@@ -49,29 +49,7 @@ export class ConversationService {
     });
 
     const newConversation = await this.directConversationRepository.save(conversation);
-    this.eventEmitter.emit(
-      CONVERSATION_CREATED_EVENT,
-      Builder<ConversationCreatedEvent>()
-        .conversationId(newConversation.id)
-        .membersIdsList([firstUserId, secondUserId])
-        .build()
-    );
-  }
-
-  async remove(id: string, userIdMakeRequest: string) {
-    const conversation = await this.findOne(id, true);
-    this.checkConversationManipulationPermission(conversation, userIdMakeRequest);
-
-    await this.conversationRepository.delete({ id });
-
-    const membersIdsList = conversation.users.map(user => user.id);
-    this.eventEmitter.emit(
-      CONVERSATION_DELETED_EVENT,
-      Builder<ConversationDeletedEvent>()
-        .conversationId(id)
-        .membersIdsList(membersIdsList)
-        .build()
-    );
+    this.emitDirectConversationCreatedEvent(newConversation);
   }
 
   async findAllConversations(userId: string): Promise<Conversation[]> {
@@ -96,18 +74,13 @@ export class ConversationService {
     return conversation;
   }
 
-  checkConversationManipulationPermission(conversation: Conversation, userIdMakeRequest: string) {
-    if (conversation instanceof GroupConversation) {
-      if (userIdMakeRequest !== conversation.adminId) {
-        throw new ForbiddenException("You are not admin of this group");
-      }
-    } else if (conversation instanceof DirectConversation) {
-      const conversationMembers = conversation.users;
-      if (!isObjectWithIdExist(conversationMembers, userIdMakeRequest)) {
-        throw new ForbiddenException("You are not member of this direct conversation");
-      }
-    } else {
-      throw new BadRequestException("It's unexpected, it's my fault");
-    }
+  private emitDirectConversationCreatedEvent(newConversation: DirectConversation) {
+    this.eventEmitter.emit(
+      CONVERSATION_CREATED_EVENT,
+      Builder<ConversationCreatedEvent>()
+        .conversationId(newConversation.id)
+        .membersIdsList(newConversation.users.map(user => user.id))
+        .build()
+    );
   }
 }

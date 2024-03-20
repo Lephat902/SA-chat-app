@@ -71,45 +71,56 @@ export class MessageService {
     }));
   }
 
-  async getMessages(messageQueryDto: MessageQueryDto) {
+  async getMessages(userIdMakeRequest: string, messageQueryDto: MessageQueryDto) {
     const { conversationId, limit, dir, markMessageId } = messageQueryDto;
 
-    let queryBuilder = this.messageRepository.createQueryBuilder('message')
-      .leftJoinAndSelect('message.user', 'user')
-      .leftJoinAndSelect('message.conversation', 'conversation')
-      .leftJoinAndSelect('conversation.userConversations', 'userConversation', 'userConversation.lastReadMessageId = message.id')
-      .addSelect('userConversation.user.id', 'lastReadUserId')
-      .where('message.conversationId = :conversationId', { conversationId })
+    // Constructing the base query
+    const queryBuilder = this.messageRepository.createQueryBuilder('message')
+      // Get 'userId' for each message
+      .leftJoin('message.user', 'user')
+      // Get messages for just given conversation
+      .leftJoin('message.conversation', 'conversation', 'conversation.id = :conversationId', { conversationId })
+      // Get last read users for each message of the conversation
+      .leftJoin('conversation.userConversations', 'userConversation', 'userConversation.lastReadMessageId = message.id')
+      .leftJoin('userConversation.user', 'userConversationUser')
+      // Ensure only participants can see the messages
+      .innerJoin('conversation.users', 'participant', 'participant.id = :userIdMakeRequest', { userIdMakeRequest })
+      // Select only necessary fields
+      .select([
+        'message.id', 'message.text', 'message.createdAt',
+        'user.id',
+        'conversation.id',
+        'userConversation',
+        'userConversationUser.id',
+      ])
       .orderBy('message.createdAt', dir)
       .take(limit);
 
+    // If markMessageId is provided, add a condition to filter messages based on the provided markMessageId
     if (markMessageId) {
       const markMessage = await this.messageRepository.findOneBy({ id: markMessageId });
       if (markMessage) {
         const comparisonOperator = dir === 'ASC' ? '>' : '<';
-        queryBuilder = queryBuilder.andWhere(`message.createdAt ${comparisonOperator} :markMessageCreatedAt`, { markMessageCreatedAt: markMessage.createdAt });
+        queryBuilder.andWhere(`message.createdAt ${comparisonOperator} :markMessageCreatedAt`, { markMessageCreatedAt: markMessage.createdAt });
       }
     }
 
-    const messages = await queryBuilder.getRawMany();
+    // Execute the query to get entities
+    const messages = await queryBuilder.getMany();
 
-    // Group by message id to get lastReadUsers for each message
-    const groupedMessages = messages.reduce((acc, message) => {
-      if (!acc[message.message_id]) {
-        acc[message.message_id] = {
-          id: message.message_id,
-          text: message.message_text,
-          createdAt: message.message_createdAt,
-          lastReadUsers: [],
-        };
-      }
-      if (message.lastReadUserId) {
-        acc[message.message_id].lastReadUsers.push(message.lastReadUserId);
-      }
-      return acc;
-    }, {});
+    return this.formatReturnedMessages(messages);
+  }
 
-    return Object.values(groupedMessages);
+  private formatReturnedMessages(messages: Message[]) {
+    return messages.map(message => ({
+      id: message.id,
+      userId: message.user.id,
+      text: message.text,
+      createdAt: message.createdAt,
+      lastReadUsers: message.conversation.userConversations
+        .map(userConversation => userConversation.user.id)
+        .filter(Boolean)
+    }));
   }
 
   private async validateUserCanSendMessage(userId: string, conversationId: string) {
@@ -159,7 +170,7 @@ export class MessageService {
     });
 
     if (!userConversation) {
-      const conversationWithUsers = await this.conversationService.findOne(conversationId, true);
+      const conversationWithUsers = await this.conversationService.findOneWithUsersById(conversationId);
       if (this.conversationService.isMemberOfConversation(conversationWithUsers, userId)) {
         const createdRecords = await this.createUserConversationRecords(conversationId, [userId]);
         userConversation = createdRecords[0];

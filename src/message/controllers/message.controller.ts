@@ -4,7 +4,7 @@ import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { MessageService } from '../services';
 import { ConversationService } from 'src/conversation/services';
-import { RequestWithUser } from 'src/common/interfaces';
+import { RequestWithUser } from 'src/common/';
 
 @Controller('conversations')
 @ApiTags("Conversation's Message")

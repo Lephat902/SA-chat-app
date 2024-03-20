@@ -1,6 +1,6 @@
 import { Controller, Req, UseGuards, Post, Param, Put, Get } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { RequestWithUser } from 'src/common/interfaces';
+import { RequestWithUser } from 'src/common';
 import { FriendRequestService } from '../services';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 

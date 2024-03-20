@@ -15,7 +15,7 @@ import { LocalAuthGuard } from './guards/local-auth.guard';
 import { CreateUserDto, LoginUserDto } from 'src/user/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { RequestWithUser } from 'src/common/interfaces/request-with-user.interface';
+import { RequestWithUser } from 'src/common';
 import { UserService } from 'src/user/services';
 
 @Controller()

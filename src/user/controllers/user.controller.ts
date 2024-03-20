@@ -1,11 +1,28 @@
-import { Controller, Param, Get } from '@nestjs/common';
+import { Controller, Param, Get, Query } from '@nestjs/common';
 import { UserService } from '../services';
 import { ApiTags, ApiParam, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { QueryUserDto } from '../dtos';
+import { User } from '../entities';
+import { PaginatedResults } from 'src/common';
 
 @Controller('/users')
 @ApiTags('User')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
+
+  @Get()
+  @ApiOperation({
+    summary: 'Retrieve Paginated List of Users with Total Count',
+    description: 'Fetches a paginated list of users along with the total number of users available. You can filter the results using query parameters such as username (`q`), specify the page number (`page`), and set the number of results per page (`limit`). This is useful for implementing data tables or lists with pagination on the frontend.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Paginated list of users along with the total number of users returned successfully. The response includes an array of user objects for the current page and the total count of users that match the query criteria.',
+    // type: PaginatedResults<User>
+  })
+  async getAllUsersAndTotalCount(@Query() queryUserDto: QueryUserDto): Promise<PaginatedResults<User>> {
+    return this.userService.getAllUsersAndTotalCount(queryUserDto);
+  }
 
   @Get('/id/:userId/profile')
   @ApiParam({ name: 'userId', description: 'The ID of the user' })

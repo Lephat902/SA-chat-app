@@ -1,5 +1,5 @@
 import { Controller, Delete, ForbiddenException, Get, Param, Req, UseGuards } from '@nestjs/common';
-import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
+import { RequestWithUser } from '../../common';
 import { ConversationService } from '../services/conversation.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';

@@ -5,10 +5,11 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { CreateUserDto, UpdateUserDto } from '../dtos';
+import { CreateUserDto, QueryUserDto, UpdateUserDto } from '../dtos';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Builder } from 'builder-pattern';
 import { ONLINE_STATUS_UPDATED_EVENT, OnlineStatusUpdatedEvent } from 'src/events';
+import { PaginatedResults } from 'src/common';
 
 @Injectable()
 export class UserService {
@@ -16,6 +17,29 @@ export class UserService {
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly eventEmitter: EventEmitter2,
   ) { }
+
+  async getAllUsersAndTotalCount(queryUserDto: QueryUserDto): Promise<PaginatedResults<User>> {
+    const { q, page = 1, limit = 10 } = queryUserDto;
+
+    // Create a query builder
+    const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+    // Filter by username if q is provided
+    if (q) {
+      queryBuilder.where('user.username LIKE :q', { q: `%${q}%` });
+    }
+
+    // Calculate offsets for pagination
+    const skip = (page - 1) * limit;
+    queryBuilder.skip(skip).take(limit);
+
+    const [totalCount, results] = await Promise.all([
+      queryBuilder.getCount(),
+      queryBuilder.getMany(),
+    ]);
+
+    return { results, totalCount };
+  }
 
   async findOneById(id: string, withConversations: boolean = false): Promise<User> {
     const user = await this.userRepository.findOne({

@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards } from '@nestjs/common';
-import { RequestWithUser } from '../../common/interfaces/request-with-user.interface';
+import { RequestWithUser } from '../../common';
 import { CreateGroupConversationDto, UpdateGroupConversationDto } from '../dtos';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags, ApiResponse } from '@nestjs/swagger';

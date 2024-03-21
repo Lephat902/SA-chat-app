@@ -6,17 +6,19 @@ using UnityEngine.UI;
 
 public class FriendItemView : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI userID;
-    [SerializeField] private TextMeshProUGUI userName;
-    [SerializeField] private Image userAvatar;
-    [SerializeField] private Sprite defaultSpite;
+    [SerializeField] protected TextMeshProUGUI userID;
+    [SerializeField] protected TextMeshProUGUI userName;
+    [SerializeField] protected Image userAvatar;
+    [SerializeField] protected Sprite defaultSpite;
+    protected FriendDataModel friendDataModel;
 
     // Update is called once per frame
-    public void SetUI(string id, string name, string avatarUrl)
+    public void SetUI(FriendDataModel friendDataModel)
     {
-        userID.text = id;
-        userName.text = name;
-        StartCoroutine(LoadImage(avatarUrl));
+        userID.text = friendDataModel.id;
+        userName.text = friendDataModel.username;
+        StartCoroutine(LoadImage(friendDataModel.avatar));
+        this.friendDataModel = friendDataModel;
     }
 
     private IEnumerator LoadImage(string avatarUrl)

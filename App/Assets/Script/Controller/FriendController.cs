@@ -37,6 +37,7 @@ public class FriendController : MonoBehaviour
 
     void Start()
     {
+        OpenTap(friendObj);
         LoadDataFriend();
 
         friendOpenBtn.onClick.AddListener(OpenFriend);
@@ -98,13 +99,14 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriend.Count)
             {
-                listFriend[i].SetUI(friendData.id, friendData.username, friendData.avatar);
+                listFriend[i].SetUI(friendData);
                 listFriend[i].gameObject.SetActive(true);
             }
 
             else
             {
                 var newItem = Instantiate(friendItemObj, friendContentObj);
+                newItem.SetUI(friendData);
                 listFriend.Add(newItem);
             }
         }
@@ -125,13 +127,14 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriendSearch.Count)
             {
-                listFriendSearch[i].SetUI(friendData.id, friendData.username, friendData.avatar);
+                listFriendSearch[i].SetUI(friendData);
                 listFriendSearch[i].gameObject.SetActive(true);
             }
 
             else
             {
-                var newItem = Instantiate(friendItemObj, friendContentObj);
+                var newItem = Instantiate(friendSearchItemObj, friendSearchContentObj);
+                newItem.SetUI(friendData);
                 listFriendSearch.Add(newItem);
             }
         }
@@ -152,14 +155,14 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriendRequest.Count)
             {
-                listFriendRequest[i].SetUI(friendData.id, friendData.username, friendData.avatar);
+                listFriendRequest[i].SetUI(friendData);
                 listFriendRequest[i].gameObject.SetActive(true);
             }
 
             else
             {
                 var newItem = Instantiate(friendRequestItemObj, friendContentObj);
-                listFriendRequest[i].SetUI(friendData.id, friendData.username, friendData.avatar);
+                newItem.SetUI(friendData);
                 listFriendRequest.Add(newItem);
             }
         }

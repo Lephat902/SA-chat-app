@@ -467,13 +467,17 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 838382857047050637, guid: 4e175a4adc953f04e917a795e4b7322f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1044714784852435194, guid: 4e175a4adc953f04e917a795e4b7322f, type: 3}
       propertyPath: m_Name
       value: FriendController
       objectReference: {fileID: 0}
-    - target: {fileID: 2844126684488745850, guid: 4e175a4adc953f04e917a795e4b7322f, type: 3}
-      propertyPath: isTest
-      value: 1
+    - target: {fileID: 2055743139948875411, guid: 4e175a4adc953f04e917a795e4b7322f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5000043773182469904, guid: 4e175a4adc953f04e917a795e4b7322f, type: 3}
       propertyPath: m_Pivot.x

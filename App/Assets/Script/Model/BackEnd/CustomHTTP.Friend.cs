@@ -92,4 +92,49 @@ public static partial class CustomHTTP
         else
             result.Invoke(JsonUtility.FromJson<List<FriendDataModel>>(content));
     }
+
+    public static async void SendRequestFriend(string accessToken, string id, Action<bool> result)
+    {
+        var url = DOMAIN + $"/users/friend-requests/{id}";
+        var response = await POST(url, null, accessToken);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            result.Invoke(false);
+        else
+            result.Invoke(true);
+    }
+
+    public static async void AcceptRequestFriend(string accessToken, string id, Action<bool> result)
+    {
+        var url = DOMAIN + $"/users/received-requests/{id}/accept";
+        var response = await PUT(url, null);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            result.Invoke(false);
+        else
+            result.Invoke(true);
+    }
+
+    public static async void RefuseRequestFriend(string accessToken, string id, Action<bool> result)
+    {
+        var url = DOMAIN + $"/users/friend-requests/{id}";
+        var response = await PUT(url, null);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            result.Invoke(false);
+        else
+            result.Invoke(true);
+    }
 }

@@ -35,10 +35,14 @@ public static partial class CustomHTTP
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Debug.Log("Result: " + content);
+        Debug.Log("Result: " + content + " " + content.Length);
 
         if (content.Length <= 2)
+        {
             result.Invoke(new List<FriendDataModel>());
+            return;
+        }
+
 
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
@@ -55,7 +59,6 @@ public static partial class CustomHTTP
         var content = await response.Content.ReadAsStringAsync();
 
         Debug.Log("Result: " + content);
-
 
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
@@ -79,7 +82,10 @@ public static partial class CustomHTTP
         Debug.Log("Result: " + content);
 
         if (content.Length <= 2)
+        {
             result.Invoke(new List<FriendDataModel>());
+            return;
+        }
 
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));

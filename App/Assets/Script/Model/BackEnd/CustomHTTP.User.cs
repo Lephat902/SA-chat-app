@@ -37,8 +37,9 @@ public struct UserFailRequest
 
 public static partial class CustomHTTP
 {
-    public static async void Profile(string url, Action<UserDataModel> result, Action<UserFailRequest> error)
+    public static async void Profile(string userName, Action<UserDataModel> result, Action<UserFailRequest> error)
     {
+        var url = CustomHTTP.DOMAIN + $"/users/username/{userName}/profile";
         var response = await GET(url);
 
         var content = await response.Content.ReadAsStringAsync();

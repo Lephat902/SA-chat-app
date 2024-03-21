@@ -20,10 +20,11 @@ public static partial class CustomHTTP
         }
     }
 
-    private static async Task<HttpResponseMessage> GET(string url)
+    private static async Task<HttpResponseMessage> GET(string url, string accessToken = null)
     {
         using (var client = new HttpClient())
         {
+            client.DefaultRequestHeaders.Add("Authorization", "Bearer " + accessToken);
             var respone = await client.GetAsync(url);
 
             Debug.Log("GET from " + url);

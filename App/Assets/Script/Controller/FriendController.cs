@@ -35,8 +35,8 @@ public class FriendController : MonoBehaviour
     {
         OpenTap(friendObj);
 
-        if(userDataAsset.UserDataModel.)
+        /*if(userDataAsset.UserDataModel.f)
 
-        for(int i = 0)
+        for(int i = 0)*/
     }
 }

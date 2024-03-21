@@ -28,6 +28,7 @@ public class SignUpController : MonoBehaviour
 
     [Header("Data")]
     [SerializeField] private UserDataAsset userDataAsset;
+    [SerializeField] private FriendDataAsset friendDataAsset;
 
     void Start()
     {
@@ -124,20 +125,10 @@ public class SignUpController : MonoBehaviour
             (res) =>
             {
                 userDataAsset.UserDataModel = res;
+
                 statusText.text = "Loading to Home!";
 
-                CustomHTTP.GetFriend( userDataAsset.AccessToken,
-                    (res) =>
-                    {
-                        statusText.text = "Get friends!";
-
-                        SceneManager.LoadScene("Home", LoadSceneMode.Single);
-                    },
-                    (err) =>
-                    {
-                        ActionAllButton(true);
-                        statusText.text = err.message[0];
-                    });
+                SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },
             (err) =>
             {

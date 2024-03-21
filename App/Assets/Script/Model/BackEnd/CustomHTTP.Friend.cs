@@ -68,4 +68,22 @@ public static partial class CustomHTTP
                 result.Invoke(data.results);
         }
     }
+
+    public static async void GetRequestFriend(string accessToken, Action<List<FriendDataModel>> result, Action<FriendFailRequest> error)
+    {
+        var url = DOMAIN + $"/users/received-requests";
+        var response = await GET(url, accessToken);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (content.Length <= 2)
+            result.Invoke(new List<FriendDataModel>());
+
+        if (!response.IsSuccessStatusCode)
+            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
+        else
+            result.Invoke(JsonUtility.FromJson<List<FriendDataModel>>(content));
+    }
 }

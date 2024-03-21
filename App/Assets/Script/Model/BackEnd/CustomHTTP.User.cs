@@ -13,20 +13,6 @@ public struct UserDataModel
     public string password;
     public string avatar;
     public bool isOnline;
-
-    public List<FriendRequestModel> sentFriendRequests;
-    public List<FriendRequestModel> receivedFriendRequests;
-}
-
-[Serializable]
-public struct FriendRequestModel
-{
-    public string id;
-    public string requester;
-    public string recipient;
-    public string createdAt;
-    public string status;
-    public string updatedAt;
 }
 
 public struct UserFailRequest

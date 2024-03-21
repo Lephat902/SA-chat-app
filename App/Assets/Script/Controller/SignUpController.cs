@@ -98,15 +98,51 @@ public class SignUpController : MonoBehaviour
 
     private void ClearStatus() => statusText.text = string.Empty;
 
-    private void StartHome(string userName) {
-        CustomHTTP.Profile(CustomHTTP.DOMAIN + $"/users/username/{userName}/profile",
+    private void ActionAllButton(bool isEnable)
+    {
+        if (isEnable)
+        {
+            signUpButton.gameObject.SetActive(true);
+            signUpSwitch.gameObject.SetActive(true);
+            signInButton.gameObject.SetActive(true);
+            signInSwitch.gameObject.SetActive(true);
+        }
+        else
+        {
+            signUpButton.gameObject.SetActive(false);
+            signUpSwitch.gameObject.SetActive(false);
+            signInButton.gameObject.SetActive(false);
+            signInSwitch.gameObject.SetActive(false);
+        }
+    }
+
+    private void StartHome(string userName)
+    {
+        ActionAllButton(false);
+
+        CustomHTTP.Profile(userName,
             (res) =>
             {
-                userDataAsset.AccessToken = res.accessToken;
                 userDataAsset.UserDataModel = res;
                 statusText.text = "Loading to Home!";
-                SceneManager.LoadScene("Home", LoadSceneMode.Single);
+
+                CustomHTTP.GetFriend( userDataAsset.AccessToken,
+                    (res) =>
+                    {
+                        statusText.text = "Get friends!";
+
+                        SceneManager.LoadScene("Home", LoadSceneMode.Single);
+                    },
+                    (err) =>
+                    {
+                        ActionAllButton(true);
+                        statusText.text = err.message[0];
+                    });
             },
-            (err) => { statusText.text = err.message; });
+            (err) =>
+            {
+                ActionAllButton(true);
+                statusText.text = err.message;
+            });
     }
 }

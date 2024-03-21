@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5077362548075545385}
   - component: {fileID: 5077362548075545302}
   - component: {fileID: 5077362548075545303}
+  - component: {fileID: 7851996339111300656}
   m_Layer: 5
   m_Name: FriendContent
   m_TagString: Untagged
@@ -108,6 +109,18 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
+--- !u!225 &7851996339111300656
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5077362548075545301}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 0
+  m_IgnoreParentGroups: 0
 --- !u!1 &5077362548639365077
 GameObject:
   m_ObjectHideFlags: 0
@@ -120,7 +133,7 @@ GameObject:
   - component: {fileID: 5077362548639365079}
   - component: {fileID: 5077362548639365078}
   m_Layer: 5
-  m_Name: Content
+  m_Name: FriendContent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -4,6 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+public struct ListFriendDataModel
+{
+    public List<FriendDataModel> list;
+}
+
 [Serializable]
 public struct FriendDataModel
 {
@@ -37,17 +42,10 @@ public static partial class CustomHTTP
 
         Debug.Log("Result: " + content + " " + content.Length);
 
-        if (content.Length <= 2)
-        {
-            result.Invoke(new List<FriendDataModel>());
-            return;
-        }
-
-
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
         else
-            result.Invoke(JsonUtility.FromJson<List<FriendDataModel>>(content));
+            result.Invoke(JsonUtility.FromJson<ListFriendDataModel>("{ \"list\": " + content + "}").list);
     }
 
     public static async void SearchFriend(string searchString, Action<List<FriendDataModel>> result, Action<FriendFailRequest> error)
@@ -81,16 +79,10 @@ public static partial class CustomHTTP
 
         Debug.Log("Result: " + content);
 
-        if (content.Length <= 2)
-        {
-            result.Invoke(new List<FriendDataModel>());
-            return;
-        }
-
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
         else
-            result.Invoke(JsonUtility.FromJson<List<FriendDataModel>>(content));
+            result.Invoke(JsonUtility.FromJson<ListFriendDataModel>("{ \"list\": " + content + "}").list);
     }
 
     public static async void SendRequestFriend(string accessToken, string id, Action<bool> result)
@@ -111,7 +103,7 @@ public static partial class CustomHTTP
     public static async void AcceptRequestFriend(string accessToken, string id, Action<bool> result)
     {
         var url = DOMAIN + $"/users/received-requests/{id}/accept";
-        var response = await PUT(url, null);
+        var response = await PUT(url, accessToken);
 
         var content = await response.Content.ReadAsStringAsync();
 
@@ -126,7 +118,7 @@ public static partial class CustomHTTP
     public static async void RefuseRequestFriend(string accessToken, string id, Action<bool> result)
     {
         var url = DOMAIN + $"/users/friend-requests/{id}";
-        var response = await PUT(url, null);
+        var response = await PUT(url, accessToken);
 
         var content = await response.Content.ReadAsStringAsync();
 

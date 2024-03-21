@@ -34,6 +34,7 @@ public class RequestFriendItemView : FriendItemView
                     {
                         friendDataAsset.RequestList.Remove(friendDataModel);
                         friendDataAsset.FriendList.Add(friendDataModel);
+                        FriendController.OnChangeFriend.Invoke();
                         gameObject.SetActive(false);
                         return;
                     }

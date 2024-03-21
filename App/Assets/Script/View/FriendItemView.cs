@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -12,7 +13,6 @@ public class FriendItemView : MonoBehaviour
     [SerializeField] protected Sprite defaultSpite;
     protected FriendDataModel friendDataModel;
 
-    // Update is called once per frame
     public void SetUI(FriendDataModel friendDataModel)
     {
         userID.text = friendDataModel.id;

@@ -55,21 +55,21 @@ MonoBehaviour:
   userDataAsset: {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
   friendDataAsset: {fileID: 11400000, guid: 398e66f6fc4e5ea48bb5232db4245c18, type: 2}
   friendOpenBtn: {fileID: 1882964657}
-  friendObj: {fileID: 868738300}
+  friendCanvasGroup: {fileID: 3062886758980528153}
   friendContentObj: {fileID: 1370018301}
   friendItemObj: {fileID: 4164348099058665987, guid: a7b960195388c3d40b955d6b5ad93dbb, type: 3}
   listFriend: []
   friendSearchOpenBtn: {fileID: 838382856534366913}
-  friendSearchObj: {fileID: 838382857624632460}
+  friendSearchCanvasGroup: {fileID: 2387760490516443241}
   friendSearchBtn: {fileID: 2531431109358814902}
   friendSearchInput: {fileID: 1743352743409007843}
   friendSearchContentObj: {fileID: 838382857047050637}
-  friendSearchItemObj: {fileID: 4164348099058665987, guid: a7b960195388c3d40b955d6b5ad93dbb, type: 3}
+  friendSearchItemObj: {fileID: 6591754112588110377, guid: c799c3287d4597b4d9bb1238b710730b, type: 3}
   listFriendSearch: []
   friendRequestOpenBtn: {fileID: 2055743139436191199}
-  friendRequestObj: {fileID: 2055743138310814610}
+  friendRequestCanvasGroup: {fileID: 3893071854557575031}
   friendRequestContentObj: {fileID: 2055743139948875411}
-  friendRequestItemObj: {fileID: 4164348099058665987, guid: a7b960195388c3d40b955d6b5ad93dbb, type: 3}
+  friendRequestItemObj: {fileID: 4728749523120215041, guid: 7f788e57d1b9a6648b65465b4e2118c3, type: 3}
   listFriendRequest: []
 --- !u!1 &1141971439014596678
 GameObject:
@@ -859,10 +859,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 5077362548639365077, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
-      propertyPath: m_Name
-      value: FriendContent
-      objectReference: {fileID: 0}
     - target: {fileID: 5077362548844537988, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5
@@ -951,17 +947,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Friend
       objectReference: {fileID: 0}
-    - target: {fileID: 5077362548844537989, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
---- !u!1 &868738300 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5077362548075545301, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
-  m_PrefabInstance: {fileID: 5077362547811526185}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &1370018301 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5077362548639365076, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
@@ -983,6 +970,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!225 &3062886758980528153 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7851996339111300656, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+  m_PrefabInstance: {fileID: 5077362547811526185}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5608356554816650841
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1149,14 +1141,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 5077362548639365076, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
   m_PrefabInstance: {fileID: 5608356554816650841}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &838382857624632460 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5077362548075545301, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
-  m_PrefabInstance: {fileID: 5608356554816650841}
-  m_PrefabAsset: {fileID: 0}
 --- !u!224 &838382857624632461 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5077362548075545300, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+  m_PrefabInstance: {fileID: 5608356554816650841}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &2387760490516443241 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7851996339111300656, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
   m_PrefabInstance: {fileID: 5608356554816650841}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6553050991336110407
@@ -1296,11 +1288,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
---- !u!1 &2055743138310814610 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5077362548075545301, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
-  m_PrefabInstance: {fileID: 6553050991336110407}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &2055743139436191199 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5077362549152179352, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
@@ -1320,5 +1307,10 @@ RectTransform:
 --- !u!224 &2055743140020359619 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5077362548844537988, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+  m_PrefabInstance: {fileID: 6553050991336110407}
+  m_PrefabAsset: {fileID: 0}
+--- !u!225 &3893071854557575031 stripped
+CanvasGroup:
+  m_CorrespondingSourceObject: {fileID: 7851996339111300656, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
   m_PrefabInstance: {fileID: 6553050991336110407}
   m_PrefabAsset: {fileID: 0}

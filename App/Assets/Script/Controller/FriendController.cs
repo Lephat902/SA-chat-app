@@ -1,9 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 public class FriendController : MonoBehaviour
@@ -14,14 +14,14 @@ public class FriendController : MonoBehaviour
 
     [Header("Friend")]
     [SerializeField] private Button friendOpenBtn;
-    [SerializeField] private GameObject friendObj;
+    [SerializeField] private CanvasGroup friendCanvasGroup;
     [SerializeField] private Transform friendContentObj;
     [SerializeField] private FriendItemView friendItemObj;
     [ReadOnly] [SerializeField] private List<FriendItemView> listFriend = new();
 
     [Header("Search")]
     [SerializeField] private Button friendSearchOpenBtn;
-    [SerializeField] private GameObject friendSearchObj;
+    [SerializeField] private CanvasGroup friendSearchCanvasGroup;
     [SerializeField] private Button friendSearchBtn;
     [SerializeField] private TMP_InputField friendSearchInput;
     [SerializeField] private Transform friendSearchContentObj;
@@ -30,14 +30,17 @@ public class FriendController : MonoBehaviour
 
     [Header("Request")]
     [SerializeField] private Button friendRequestOpenBtn;
-    [SerializeField] private GameObject friendRequestObj;
+    [SerializeField] private CanvasGroup friendRequestCanvasGroup;
     [SerializeField] private Transform friendRequestContentObj;
     [SerializeField] private FriendItemView friendRequestItemObj;
     [ReadOnly] [SerializeField] private List<FriendItemView> listFriendRequest = new();
 
+    public static UnityEvent OnChangeFriend = new();
+
     void Start()
     {
-        OpenTap(friendObj);
+        OnChangeFriend.AddListener(SetUIFriend);
+        OpenTap(friendCanvasGroup);
         LoadDataFriend();
 
         friendOpenBtn.onClick.AddListener(OpenFriend);
@@ -70,7 +73,7 @@ public class FriendController : MonoBehaviour
                 friendDataAsset.FriendList = res;
                 SetUIFriend();
             },
-            (err) => { });
+            (err) => { Debug.LogError("Error Load Friend"); });
     }
 
     private void LoadRequest()
@@ -81,7 +84,7 @@ public class FriendController : MonoBehaviour
                 friendDataAsset.RequestList = res;
                 SetUIRequest();
             },
-            (err) => { });
+            (err) => { Debug.LogError("Error Load Friend Request"); });
     }
 
     #endregion
@@ -161,7 +164,7 @@ public class FriendController : MonoBehaviour
 
             else
             {
-                var newItem = Instantiate(friendRequestItemObj, friendContentObj);
+                var newItem = Instantiate(friendRequestItemObj, friendRequestContentObj);
                 newItem.SetUI(friendData);
                 listFriendRequest.Add(newItem);
             }
@@ -176,20 +179,30 @@ public class FriendController : MonoBehaviour
 
     #region ActionButton
 
-    private void OpenTap(GameObject tapObject)
+    private void OpenTap(CanvasGroup tapObject)
     {
-        friendObj.SetActive(false);
-        friendSearchObj.SetActive(false);
-        friendRequestObj.SetActive(false);
+        friendCanvasGroup.alpha = 0;
+        friendCanvasGroup.interactable = false;
+        friendCanvasGroup.blocksRaycasts = false;
 
-        tapObject.SetActive(true);
+        friendSearchCanvasGroup.alpha = 0;
+        friendSearchCanvasGroup.interactable = false;
+        friendSearchCanvasGroup.blocksRaycasts = false;
+
+        friendRequestCanvasGroup.alpha = 0;
+        friendRequestCanvasGroup.interactable = false;
+        friendRequestCanvasGroup.blocksRaycasts = false;
+
+        tapObject.alpha = 1;
+        tapObject.interactable = true;
+        tapObject.blocksRaycasts = true;
     }
 
-    private void OpenFriend() => OpenTap(friendObj);
+    private void OpenFriend() => OpenTap(friendCanvasGroup);
 
-    private void OpenFriendSearch() => OpenTap(friendSearchObj);
+    private void OpenFriendSearch() => OpenTap(friendSearchCanvasGroup);
 
-    private void OpenFriendRequest() => OpenTap(friendRequestObj);
+    private void OpenFriendRequest() => OpenTap(friendRequestCanvasGroup);
 
     #endregion
 

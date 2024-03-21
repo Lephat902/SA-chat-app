@@ -25,15 +25,7 @@ public class AddFriendItemView : FriendItemView
         CustomHTTP.SendRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
             (result) =>
             {
-                foreach (var friendDataModel in friendDataAsset.RequestList)
-                {
-                    if (friendDataModel.id == this.friendDataModel.id)
-                    {
-                        friendDataAsset.RequestList.Remove(friendDataModel);
-                        addFriendButton.gameObject.SetActive(false);
-                        return;
-                    }
-                }
+                addFriendButton.gameObject.SetActive(false);
             });
     }
 }

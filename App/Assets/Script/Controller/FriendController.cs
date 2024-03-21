@@ -1,44 +1,56 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using Unity.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class FriendController : MonoBehaviour
 {
-    [SerializeField] private bool isTest;
-
     [Header("Data")]
     [SerializeField] private UserDataAsset userDataAsset;
     [SerializeField] private FriendDataAsset friendDataAsset;
 
     [Header("Friend")]
-    [SerializeField] private Button friendBtn;
+    [SerializeField] private Button friendOpenBtn;
     [SerializeField] private GameObject friendObj;
-    [SerializeField] private GameObject friendContentObj;
-    [SerializeField] private GameObject friendItemObj;
-
-    [Header("Friend")]
-    [SerializeField] private Transform contentFriend;
-    [SerializeField] private FriendItemView friendView;
+    [SerializeField] private Transform friendContentObj;
+    [SerializeField] private FriendItemView friendItemObj;
     [ReadOnly] [SerializeField] private List<FriendItemView> listFriend = new();
 
+    [Header("Search")]
+    [SerializeField] private Button friendSearchOpenBtn;
+    [SerializeField] private GameObject friendSearchObj;
+    [SerializeField] private Button friendSearchBtn;
+    [SerializeField] private TMP_InputField friendSearchInput;
+    [SerializeField] private Transform friendSearchContentObj;
+    [SerializeField] private FriendItemView friendSearchItemObj;
+    [ReadOnly] [SerializeField] private List<FriendItemView> listFriendSearch = new();
+
     [Header("Request")]
-    [SerializeField] private Transform contentFriendRequest;
-    [SerializeField] private FriendItemView friendRequestView;
+    [SerializeField] private Button friendRequestOpenBtn;
+    [SerializeField] private GameObject friendRequestObj;
+    [SerializeField] private Transform friendRequestContentObj;
+    [SerializeField] private FriendItemView friendRequestItemObj;
     [ReadOnly] [SerializeField] private List<FriendItemView> listFriendRequest = new();
 
     void Start()
     {
         LoadDataFriend();
 
-        friendBtn.onClick.AddListener(OpenFriend);
+        friendOpenBtn.onClick.AddListener(OpenFriend);
+        friendSearchOpenBtn.onClick.AddListener(OpenFriendSearch);
+        friendRequestOpenBtn.onClick.AddListener(OpenFriendRequest);
+        friendSearchBtn.onClick.AddListener(SearchFriend);
     }
 
     private void OnDestroy()
     {
-        friendBtn.onClick.RemoveAllListeners();
+        friendOpenBtn.onClick.RemoveAllListeners();
+        friendSearchOpenBtn.onClick.RemoveAllListeners();
+        friendRequestOpenBtn.onClick.RemoveAllListeners();
+        friendSearchBtn.onClick.RemoveAllListeners();
     }
 
     #region Load Data
@@ -55,15 +67,6 @@ public class FriendController : MonoBehaviour
             (res) =>
             {
                 friendDataAsset.FriendList = res;
-
-                if (isTest)
-                {
-                    var a = new FriendDataModel() { id = "chim", username = "chim", avatar = "https://ik.imagekit.io/demo/medium_cafe_B1iTdD0C.jpg"};
-                    friendDataAsset.FriendList = new();
-                    for (int i = 0; i < 5; i++)
-                        friendDataAsset.FriendList.Add(a);
-                }
-
                 SetUIFriend();
             },
             (err) => { });
@@ -101,7 +104,7 @@ public class FriendController : MonoBehaviour
 
             else
             {
-                var newItem = Instantiate(friendView, contentFriend);
+                var newItem = Instantiate(friendItemObj, friendContentObj);
                 listFriend.Add(newItem);
             }
         }
@@ -109,6 +112,33 @@ public class FriendController : MonoBehaviour
         if (listFriend.Count > friendDataAsset.FriendList.Count)
             for (int i = friendDataAsset.FriendList.Count; i < listFriend.Count; i++)
                 listFriend[i].gameObject.SetActive(false);
+    }
+
+    private void SetUISearch(List<FriendDataModel> res)
+    {
+        if (res == null)
+            return;
+
+        for (int i = 0; i < res.Count; i++)
+        {
+            var friendData = res[i];
+
+            if (i < listFriendSearch.Count)
+            {
+                listFriendSearch[i].SetUI(friendData.id, friendData.username, friendData.avatar);
+                listFriendSearch[i].gameObject.SetActive(true);
+            }
+
+            else
+            {
+                var newItem = Instantiate(friendItemObj, friendContentObj);
+                listFriendSearch.Add(newItem);
+            }
+        }
+
+        if (listFriendSearch.Count > res.Count)
+            for (int i = res.Count; i < listFriendSearch.Count; i++)
+                listFriendSearch[i].gameObject.SetActive(false);
     }
 
     private void SetUIRequest()
@@ -128,7 +158,8 @@ public class FriendController : MonoBehaviour
 
             else
             {
-                var newItem = Instantiate(friendRequestView, contentFriend);
+                var newItem = Instantiate(friendRequestItemObj, friendContentObj);
+                listFriendRequest[i].SetUI(friendData.id, friendData.username, friendData.avatar);
                 listFriendRequest.Add(newItem);
             }
         }
@@ -140,18 +171,31 @@ public class FriendController : MonoBehaviour
 
     #endregion
 
+    #region ActionButton
+
     private void OpenTap(GameObject tapObject)
     {
         friendObj.SetActive(false);
+        friendSearchObj.SetActive(false);
+        friendRequestObj.SetActive(false);
+
         tapObject.SetActive(true);
     }
 
-    private void OpenFriend()
+    private void OpenFriend() => OpenTap(friendObj);
+
+    private void OpenFriendSearch() => OpenTap(friendSearchObj);
+
+    private void OpenFriendRequest() => OpenTap(friendRequestObj);
+
+    #endregion
+
+    #region ActionSearch
+    private void SearchFriend()
     {
-        OpenTap(friendObj);
-
-        /*if(userDataAsset.UserDataModel.f)
-
-        for(int i = 0)*/
+        CustomHTTP.SearchFriend(friendSearchInput.text,
+            (res) => { SetUISearch(res); },
+            (err) => { });
     }
+    #endregion
 }

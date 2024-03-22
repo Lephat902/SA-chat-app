@@ -5,6 +5,7 @@ import {
   JoinTable,
   TableInheritance,
   Entity,
+  CreateDateColumn,
 } from 'typeorm';
 import { User } from 'src/user/entities';
 import { Message } from 'src/message/entities/message.entity';
@@ -15,6 +16,9 @@ import { UserConversation } from 'src/message/entities';
 export abstract class Conversation {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @CreateDateColumn()
+  createdAt: Date;
 
   @ManyToMany(() => User, user => user.conversations)
   @JoinTable()

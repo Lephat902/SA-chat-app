@@ -4,6 +4,7 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Patch,
   Post,
   Req,
   Res,
@@ -12,7 +13,7 @@ import {
 import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
-import { CreateUserDto, LoginUserDto } from 'src/user/dtos';
+import { CreateUserDto, LoginUserDto, UpdateUserDto } from 'src/user/dtos';
 import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RequestWithUser } from 'src/common';
@@ -34,6 +35,19 @@ export class AuthController {
   async getProfile(@Req() req: RequestWithUser) {
     const userId = req.user.id;
     return this.userService.findOneById(userId);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('/profile')
+  @ApiBearerAuth()
+  @ApiOperation({ summary: 'Update user profile', description: 'Updated the profile of the currently authenticated user.' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully.' })
+  async updateProfile(
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: RequestWithUser,
+  ) {
+    const userId = req.user.id;
+    return this.userService.update(userId, updateUserDto);
   }
 
   @Post('/signUp')

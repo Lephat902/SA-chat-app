@@ -28,14 +28,14 @@ export class FriendRequestService {
     async getMySentRequests(userId: string) {
         return this.friendRequestRepository.find({
             where: { requester: { id: userId }, status: RequestStatus.PENDING },
-            relations: ['requester', 'recipient'],
+            relations: ['recipient'],
         });
     }
 
     async getMyReceivedRequests(userId: string) {
         return this.friendRequestRepository.find({
             where: { recipient: { id: userId }, status: RequestStatus.PENDING },
-            relations: ['requester', 'recipient'],
+            relations: ['requester'],
         });
     }
 

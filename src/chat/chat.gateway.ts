@@ -36,6 +36,7 @@ import { AsyncApiPub, AsyncApiSub } from 'nestjs-asyncapi';
 import { AddMessageDto, MarkMessageAsReadDto } from 'src/message/dtos';
 import { MessageService } from 'src/message/services';
 import { RequestStatus } from 'src/friend-request/entities';
+import { ConversationService } from 'src/conversation/services';
 
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
@@ -59,29 +60,24 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     private readonly authService: AuthService,
     private readonly friendService: FriendService,
     private readonly messageService: MessageService,
+    private readonly conversationService: ConversationService,
   ) { }
 
   async handleConnection(client: Socket): Promise<void> {
     const token = client.handshake?.query.token.toString();
     const payload = this.authService.verifyAccessToken(token);
 
-    const user = payload && (await this.userService.findOneById(payload.id, true));
+    const userId = payload.id;
+    const conversations = await this.conversationService.findAllConversationsByUserId(userId);
 
-    // User not exist then destroy the connection
-    if (!user) {
-      client.disconnect(true);
-      return;
-    }
+    this.userSocketsMap.addConnection(client.id, userId);
 
-    this.userSocketsMap.addConnection(client.id, user.id);
-
-    const conversations = user?.conversations;
     if (conversations) {
       await client.join(conversations.map(conversation => conversation.id));
     }
-    const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(user.id);
+    const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(userId);
     if (newNumberOfSocketConnections === 1)
-      await this.userService.updateOnlineStatus(user.id, true);
+      await this.userService.updateOnlineStatus(userId, true);
   }
 
   async handleDisconnect(client: Socket) {

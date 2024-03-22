@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Builder } from 'builder-pattern';
 import { ONLINE_STATUS_UPDATED_EVENT, OnlineStatusUpdatedEvent } from 'src/events';
 import { PaginatedResults } from 'src/common';
+import { comparePassword, hashPassword } from 'src/helpers';
 
 @Injectable()
 export class UserService {
@@ -37,11 +39,8 @@ export class UserService {
     return { results, totalCount };
   }
 
-  async findOneById(id: string, withConversations: boolean = false): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id },
-      ...(withConversations && { relations: ['conversations'] }),
-    });
+  async findOneById(id: string): Promise<User> {
+    const user = await this.userRepository.findOneBy({ id });
 
     if (!user) {
       throw new NotFoundException(`There is no user under id ${id}`);
@@ -54,7 +53,7 @@ export class UserService {
     return this.userRepository.findOneBy({ username });
   }
 
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: Readonly<CreateUserDto>) {
     const user = this.userRepository.create({
       ...createUserDto,
       ...(!createUserDto.avatar && { avatar: `https://robohash.org/${createUserDto.username}.png` })
@@ -63,17 +62,10 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.preload({
-      id,
-      ...updateUserDto,
-    });
-
-    if (!user) {
-      throw new NotFoundException(`There is no user under id ${id}`);
-    }
-
-    return this.userRepository.save(user);
+  async update(id: string, updateUserDto: Readonly<UpdateUserDto>) {
+    const validatedUpdateUserDto = await this.validateUpdateUserDto(id, updateUserDto);
+    const dataToUpdate = this.userRepository.create(validatedUpdateUserDto);
+    return this.userRepository.update(id, dataToUpdate);
   }
 
   async updateOnlineStatus(id: string, isOnline: boolean) {
@@ -91,5 +83,31 @@ export class UserService {
       ONLINE_STATUS_UPDATED_EVENT,
       eventPayload
     );
+  }
+
+  private async validateUpdateUserDto(id: string, updateUserDto: Readonly<UpdateUserDto>) {
+    const clonedUpdateUserDto = { ...updateUserDto };
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`There is no user under id ${id}`);
+    }
+
+    if (clonedUpdateUserDto.username) {
+      const existingUser = await this.findOneByUsername(clonedUpdateUserDto.username);
+      if (existingUser) {
+        throw new BadRequestException('Username exists');
+      }
+    }
+
+    if (clonedUpdateUserDto.newPassword) {
+      const passwordMatches = await comparePassword(clonedUpdateUserDto.oldPassword, user.password);
+      if (!passwordMatches) {
+        throw new BadRequestException('Password mismatches');
+      }
+      clonedUpdateUserDto.password = await hashPassword(clonedUpdateUserDto.newPassword);
+    }
+
+    return clonedUpdateUserDto;
   }
 }

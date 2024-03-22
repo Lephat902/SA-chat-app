@@ -1,9 +1,7 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { UserService } from 'src/user/services';
 import { Message } from '../entities/message.entity';
-import { isObjectWithIdExist } from 'src/helpers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CONVERSATION_MESSAGE_ADDED, ConversationMessageAddedEvent, LAST_READ_MESSAGE_UPDATED_EVENT, LastReadMessageUpdatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
@@ -21,7 +19,6 @@ export class MessageService {
     @InjectRepository(UserConversation)
     private readonly userConversationRepository: Repository<UserConversation>,
     private readonly conversationService: ConversationService,
-    private readonly userService: UserService,
     private readonly eventEmitter: EventEmitter2,
   ) { }
 
@@ -124,9 +121,9 @@ export class MessageService {
   }
 
   private async validateUserCanSendMessage(userId: string, conversationId: string) {
-    const user = await this.userService.findOneById(userId, true);
+    const conversation = await this.conversationService.findOneWithUsersById(conversationId);
 
-    if (!isObjectWithIdExist(user.conversations, conversationId)) {
+    if (!this.conversationService.isMemberOfConversation(conversation, userId)) {
       throw new ForbiddenException("You cannot send messages to this conversation");
     }
   }

@@ -101,7 +101,7 @@ export class GroupConversationService {
 
   async addToGroup(userIdMakeRequest: string, userIdToAdd: string, conversationId: string) {
     const [user, conversation] = await Promise.all([
-      this.userService.findOneById(userIdToAdd, true),
+      this.userService.findOneById(userIdToAdd),
       this.findGroupWithUsersById(conversationId),
     ])
 

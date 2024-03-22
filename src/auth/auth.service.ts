@@ -4,11 +4,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcryptjs';
 import { UserService } from 'src/user/services';
 import { User } from 'src/user/entities';
 import { CreateUserDto } from 'src/user/dtos';
 import { LoginUserDto } from 'src/user/dtos/login-user.dto';
+import { comparePassword, hashPassword } from 'src/helpers';
 
 @Injectable()
 export class AuthService {
@@ -17,7 +17,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) { }
 
-  async signUp(userDto: CreateUserDto) {
+  async signUp(userDto: Readonly<CreateUserDto>) {
     const candidate = await this.userService.findOneByUsername(
       userDto.username,
     );
@@ -26,7 +26,7 @@ export class AuthService {
       throw new BadRequestException("Username exists");
     };
 
-    const hashedPassword = await bcrypt.hash(userDto.password, 7);
+    const hashedPassword = await hashPassword(userDto.password);
     const user = await this.userService.create({
       ...userDto,
       password: hashedPassword,
@@ -37,7 +37,7 @@ export class AuthService {
     return tokens;
   }
 
-  async signIn(userDto: LoginUserDto) {
+  async signIn(userDto: Readonly<LoginUserDto>) {
     const user = await this.userService.findOneByUsername(userDto.username);
 
     const tokens = await this.generateTokens(user.id);
@@ -45,10 +45,10 @@ export class AuthService {
     return tokens;
   }
 
-  async validateUser(userDto: LoginUserDto): Promise<User> {
+  async validateUser(userDto: Readonly<LoginUserDto>): Promise<User> {
     const user = await this.userService.findOneByUsername(userDto.username);
 
-    if (!user || !(await bcrypt.compare(userDto.password, user.password))) {
+    if (!user || !(await comparePassword(userDto.password, user.password))) {
       throw new UnauthorizedException('Invalid credentials');
     }
 

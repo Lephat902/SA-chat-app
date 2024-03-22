@@ -57,13 +57,7 @@ export class FriendService {
     }
 
     async addFriend(firstUserId: string, secondUserId: string): Promise<void> {
-        // Check if the friendship already exists
-        const existingFriendship = await this.friendRepository.findOne({
-            where: [
-                { user1: { id: firstUserId }, user2: { id: secondUserId } },
-                { user1: { id: secondUserId }, user2: { id: firstUserId } },
-            ],
-        });
+        const existingFriendship = await this.findExistingFriendShip(firstUserId, secondUserId);
 
         if (existingFriendship) {
             throw new BadRequestException('Friend already added');
@@ -109,5 +103,14 @@ export class FriendService {
                 .secondUserId(secondUserId)
                 .build()
         );
+    }
+
+    async findExistingFriendShip(firstUserId: string, secondUserId: string): Promise<Friend> {
+        return this.friendRepository.findOne({
+            where: [
+                { user1: { id: firstUserId }, user2: { id: secondUserId } },
+                { user1: { id: secondUserId }, user2: { id: firstUserId } },
+            ],
+        });
     }
 }

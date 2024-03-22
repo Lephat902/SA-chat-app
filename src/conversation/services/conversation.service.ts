@@ -8,7 +8,7 @@ import { isObjectWithIdExist } from 'src/helpers';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CONVERSATION_CREATED_EVENT, ConversationCreatedEvent } from 'src/events';
 import { Builder } from 'builder-pattern';
-import { QueryConversationDto } from '../dtos';
+import { DirectConversationItemQueryResponse, GroupConversationItemQueryResponse, QueryConversationDto } from '../dtos';
 
 @Injectable()
 export class ConversationService {
@@ -53,7 +53,18 @@ export class ConversationService {
     this.emitDirectConversationCreatedEvent(newConversation);
   }
 
-  async findAllConversationsByUserId(queryConversationDto: Readonly<QueryConversationDto>): Promise<Conversation[]> {
+  async findAllConversationsByUserId(userId: string): Promise<Conversation[]> {
+    return this.conversationRepository.find({
+      where: {
+        users: {
+          id: userId
+        }
+      }
+    });
+  }
+
+  async findAllConversationsWithRelationsByUserId(queryConversationDto: Readonly<QueryConversationDto>)
+    : Promise<(DirectConversationItemQueryResponse | GroupConversationItemQueryResponse)[]> {
     const { userId, page = 1, limit = 10 } = queryConversationDto;
     // Constructing the query
     const queryBuilder = this.conversationRepository.createQueryBuilder('conversation')
@@ -67,7 +78,22 @@ export class ConversationService {
           .where('cuu.userId = :userId', { userId })
           .getQuery();
         return `conversation.id IN (${idsOfConversationsIncludingUserQuery})`;
-      });
+      })
+      .leftJoinAndSelect('conversation.messages', 'message')
+      .where(qb => {
+        const subQuery = qb.subQuery()
+          .select('MAX(message.createdAt)')
+          .from('Message', 'message')
+          .where('message.conversationId = conversation.id')
+          .getQuery();
+
+        return `message.createdAt IN (${subQuery})`;
+      })
+      .orderBy({
+        'message.createdAt': 'DESC', // Sort by latest message createdAt
+        'conversation.createdAt': 'DESC'
+      }
+      );
 
     // Calculate offsets for pagination
     const skip = (page - 1) * limit;
@@ -76,7 +102,14 @@ export class ConversationService {
     // Execute query and return result
     const conversations: Conversation[] = await queryBuilder.getMany();
 
-    return conversations;
+    return conversations.map(conversation => {
+      const { messages, users, ...rest } = conversation;
+      return {
+        ...rest,
+        otherUsers: users,
+        latestMessage: messages[0],
+      };
+    });
   }
 
   isMemberOfConversation(conversation: Conversation, userIdMakeRequest: string) {

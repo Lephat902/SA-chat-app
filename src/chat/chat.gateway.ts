@@ -67,7 +67,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const token = client.handshake?.query.token.toString();
     const payload = this.authService.verifyAccessToken(token);
 
-    const userId = payload.id;
+    const userId: string = payload.id;
     const conversations = await this.conversationService.findAllConversationsByUserId(userId);
 
     this.userSocketsMap.addConnection(client.id, userId);

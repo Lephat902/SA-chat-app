@@ -44,7 +44,7 @@ partial class CustomSocket : MonoBehaviour
 
     private void HandleFriendMessageUpdate(FriendMessageUpdate friendMessageRequest)
     {
-        if (friendMessageRequest.recipientId == userDataAsset.UserDataModel.id)
+        if (friendMessageRequest.requesterId == userDataAsset.UserDataModel.id)
         {
             switch (friendMessageRequest.newStatus)
             {

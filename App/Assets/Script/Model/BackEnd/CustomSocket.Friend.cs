@@ -39,7 +39,7 @@ partial class CustomSocket : MonoBehaviour
     private void HandleFriendMessageRequest(FriendMessageRequest friendMessageRequest)
     {
         if (friendMessageRequest.recipientId == userDataAsset.UserDataModel.id)
-            FriendController.OnIsAddedRequest.Invoke(friendMessageRequest.requesterId);
+            FriendController.OnIsAddedRequest.Invoke(friendMessageRequest.requestId, friendMessageRequest.requesterId);
     }
 
     private void HandleFriendMessageUpdate(FriendMessageUpdate friendMessageRequest)
@@ -49,10 +49,10 @@ partial class CustomSocket : MonoBehaviour
             switch (friendMessageRequest.newStatus)
             {
                 case "ACCEPTED":
-                    FriendController.OnIsAcceptedRequest.Invoke(friendMessageRequest.requesterId);
+                    FriendController.OnIsAcceptedRequest.Invoke(friendMessageRequest.recipientId);
                     break;
                 case "REJECTED":
-                    FriendController.OnIsRefusedRequest.Invoke(friendMessageRequest.requesterId);
+                    FriendController.OnIsRefusedRequest.Invoke(friendMessageRequest.recipientId);
                     break;
                 default:
                     break;

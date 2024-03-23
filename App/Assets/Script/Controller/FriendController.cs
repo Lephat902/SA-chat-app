@@ -38,7 +38,7 @@ public class FriendController : MonoBehaviour
 
     public static UnityEvent<string> OnAcceptRequest = new();
     public static UnityEvent<string> OnRefuseRequest = new();
-    public static UnityEvent<string> OnIsAddedRequest = new();
+    public static UnityEvent<string, string> OnIsAddedRequest = new();
     public static UnityEvent<string> OnIsAcceptedRequest = new();
     public static UnityEvent<string> OnIsRefusedRequest = new();
 
@@ -203,11 +203,11 @@ public class FriendController : MonoBehaviour
     #endregion
 
     #region ActionStatic
-    private void AcceptRequest(string id)
+    private void AcceptRequest(string requestId)
     {
         foreach (var requestDataModel in friendDataAsset.RequestList)
         {
-            if (requestDataModel.id == id)
+            if (requestDataModel.id == requestId)
             {
                 friendDataAsset.RequestList.Remove(requestDataModel);
                 friendDataAsset.FriendList.Add(requestDataModel.requester);
@@ -218,11 +218,11 @@ public class FriendController : MonoBehaviour
         }
     }
 
-    private void RefuseRequest(string id)
+    private void RefuseRequest(string requestId)
     {
         foreach (var requestDataModel in friendDataAsset.RequestList)
         {
-            if (requestDataModel.id == id)
+            if (requestDataModel.id == requestId)
             {
                 friendDataAsset.RequestList.Remove(requestDataModel);
                 SetUIRequest();
@@ -231,13 +231,13 @@ public class FriendController : MonoBehaviour
         }
     }
 
-    private void IsAddedRequest(string id)
+    private void IsAddedRequest(string requestId, string userId)
     {
         foreach (var friendDataModel in friendDataAsset.RequestList)
-            if (friendDataModel.id == id)
+            if (friendDataModel.id == requestId)
                 return;
 
-        CustomHTTP.GetProfileByID(id,
+        CustomHTTP.GetProfileByID(userId,
             (res) =>
             {
                 var friendDataModel = new FriendDataModel
@@ -247,19 +247,19 @@ public class FriendController : MonoBehaviour
                     avatar = res.avatar
                 };
 
-                friendDataAsset.RequestList.Add(new RequestDataModel() { id = id, requester = friendDataModel });
+                friendDataAsset.RequestList.Add(new RequestDataModel() { id = requestId, requester = friendDataModel });
                 SetUIRequest();
             },
             (err) => { });
     }
 
-    private void IsAcceptedRequest(string id)
+    private void IsAcceptedRequest(string userId)
     {
         foreach (var friendDataModel in friendDataAsset.FriendList)
-            if (friendDataModel.id == id)
+            if (friendDataModel.id == userId)
                 return;
 
-        CustomHTTP.GetProfileByID(id,
+        CustomHTTP.GetProfileByID(userId,
             (res) =>
             {
                 var friendDataModel = new FriendDataModel
@@ -275,7 +275,7 @@ public class FriendController : MonoBehaviour
             (err) => { });
     }
 
-    private void IsRefusedRequest(string id) { }
+    private void IsRefusedRequest(string userId) { }
 
     #endregion
 }

@@ -45,7 +45,6 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, requestId,
            (result) =>
            {
-               Debug.Log(result);
                if (result)
                    FriendController.OnRefuseRequest.Invoke(requestId);
            });

@@ -25,6 +25,7 @@ public class SignUpController : MonoBehaviour
 
     [Header("Other")]
     [SerializeField] private TextMeshProUGUI statusText;
+    [SerializeField] private CustomSocket customSocket;
 
     [Header("Data")]
     [SerializeField] private UserDataAsset userDataAsset;
@@ -125,6 +126,8 @@ public class SignUpController : MonoBehaviour
             async (res) =>
             {
                 userDataAsset.UserDataModel = res;
+
+                customSocket.StartConnect();
 
                 statusText.text = "Loading to Home!";
 

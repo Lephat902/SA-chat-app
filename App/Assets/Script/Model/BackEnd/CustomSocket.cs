@@ -13,11 +13,15 @@ partial class CustomSocket : MonoBehaviour
     private SocketIOUnity socket;
 
     // Start is called before the first frame update
-    void Start()
+    public void StartConnect()
     {
         Debug.Log("Start connect to socket");
         var uri = new Uri(DOMAIN);
-        socket = new SocketIOUnity(uri);
+        socket = new SocketIOUnity(uri, new SocketIOOptions
+        {
+            Query = new Dictionary<string, string>{{"token", userDataAsset.AccessToken } },
+            Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
+        });
         socket.OnConnected += (sender, e) => Debug.Log("Done connect to socket");
 
         socket.Connect();

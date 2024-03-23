@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
+[Serializable]
 public struct FriendMessageRequest
 {
     public string requestId;
@@ -14,6 +15,7 @@ public struct FriendMessageRequest
     public string createdAt;
 }
 
+[Serializable]
 public struct FriendMessageUpdate
 {
     public string requestId;
@@ -28,10 +30,10 @@ partial class CustomSocket : MonoBehaviour
     private void StartFriend()
     {
         socket.OnUnityThread("friend-request-sent",
-            res => HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(res.ToString())));
+            res =>HandleFriendMessageRequest(CustomJson<FriendMessageRequest>.ParseList(res.ToString())[0]));
 
         socket.OnUnityThread("friend-request-updated",
-            res => HandleFriendMessageUpdate(JsonUtility.FromJson<FriendMessageUpdate>(res.ToString())));
+            res => HandleFriendMessageUpdate(CustomJson<FriendMessageUpdate>.ParseList(res.ToString())[0]));
     }
 
     private void HandleFriendMessageRequest(FriendMessageRequest friendMessageRequest)

@@ -40,7 +40,7 @@ public static partial class CustomHTTP
 
     public static async void GetProfileByID(string userId, Action<UserDataModel> result, Action<UserFailRequest> error)
     {
-        var url = CustomHTTP.DOMAIN + $"/users/username/{userId}/profile";
+        var url = CustomHTTP.DOMAIN + $"/users/id/{userId}/profile";
         var response = await GET(url);
 
         var content = await response.Content.ReadAsStringAsync();

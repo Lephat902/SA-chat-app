@@ -87,8 +87,8 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriend.Count)
             {
-                listFriend[i].SetUI(friendData);
                 listFriend[i].gameObject.SetActive(true);
+                listFriend[i].SetUI(friendData);
             }
 
             else
@@ -115,8 +115,8 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriendSearch.Count)
             {
-                listFriendSearch[i].SetUI(friendData);
                 listFriendSearch[i].gameObject.SetActive(true);
+                listFriendSearch[i].SetUI(friendData);
             }
 
             else
@@ -145,8 +145,8 @@ public class FriendController : MonoBehaviour
 
             if (i < listFriendRequest.Count)
             {
-                listFriendRequest[i].SetUI(requestData.requester);
                 listFriendRequest[i].gameObject.SetActive(true);
+                listFriendRequest[i].SetUI(requestData.requester);
             }
 
             else

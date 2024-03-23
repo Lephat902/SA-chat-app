@@ -20,6 +20,12 @@ public class AddFriendItemView : FriendItemView
         addFriendButton.onClick.RemoveAllListeners();
     }
 
+    public override void SetUI(FriendDataModel friendDataModel)
+    {
+        base.SetUI(friendDataModel);
+        addFriendButton.gameObject.SetActive(true);
+    }
+
     private void AddFriend()
     {
         CustomHTTP.SendRequestFriend(userDataAsset.AccessToken, friendDataModel.id,

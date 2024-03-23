@@ -13,7 +13,7 @@ public class FriendItemView : MonoBehaviour
     [SerializeField] protected Sprite defaultSpite;
     protected FriendDataModel friendDataModel;
 
-    public void SetUI(FriendDataModel friendDataModel)
+    public virtual void SetUI(FriendDataModel friendDataModel)
     {
         userID.text = friendDataModel.id;
         userName.text = friendDataModel.username;

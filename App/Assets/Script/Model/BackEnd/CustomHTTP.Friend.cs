@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 
+[Serializable]
 public struct ListFriendDataModel
 {
     public List<FriendDataModel> list;
@@ -18,22 +19,27 @@ public struct FriendDataModel
     public bool isOnline;
 }
 
+[Serializable]
 public struct SearchFriendDataModel
 {
     public List<FriendDataModel> results;
     public int totalCount;
 }
 
+[Serializable]
 public struct ListRequestDataModel
 {
     public List<RequestDataModel> list;
 }
 
+[Serializable]
 public struct RequestDataModel
 {
+    public string id;
     public FriendDataModel requester;
 }
 
+[Serializable]
 public struct FriendFailRequest
 {
     public List<string> message;
@@ -93,7 +99,12 @@ public static partial class CustomHTTP
         else
         {
             var ret = new List<FriendDataModel>();
-            var requestDataModels = JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}").list;
+            var listRequestDataModel = JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}");
+            var requestDataModels = listRequestDataModel.list;
+
+            Debug.LogError(JsonUtility.ToJson(listRequestDataModel));
+            Debug.LogError(JsonUtility.ToJson(requestDataModels));
+
             for (int i = 0; i < requestDataModels.Count; i++)
                 ret.Add(requestDataModels[i].requester);
 

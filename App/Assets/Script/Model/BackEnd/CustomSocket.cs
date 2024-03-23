@@ -23,6 +23,7 @@ partial class CustomSocket : MonoBehaviour
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
         });
         socket.OnConnected += (sender, e) => Debug.Log("Done connect to socket");
+        socket.OnDisconnected += (sender, e) => Debug.LogError("Disconnect to socket");
 
         socket.Connect();
 

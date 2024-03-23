@@ -27,6 +27,7 @@ partial class CustomSocket : MonoBehaviour
 {
     private void StartFriend()
     {
+        Debug.LogError("chim");
         socket.On("friend-request-sent", 
             res => HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(res.ToString())));
 
@@ -36,7 +37,8 @@ partial class CustomSocket : MonoBehaviour
 
     private void HandleFriendMessageRequest(FriendMessageRequest friendMessageRequest)
     {
-        if(friendMessageRequest.recipientId == userDataAsset.UserDataModel.id)
+        Debug.LogError("chim");
+        if (friendMessageRequest.recipientId == userDataAsset.UserDataModel.id)
             FriendController.OnIsAddedRequest.Invoke(friendMessageRequest.requesterId);
     }
 

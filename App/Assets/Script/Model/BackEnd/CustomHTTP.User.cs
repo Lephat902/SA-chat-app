@@ -23,9 +23,24 @@ public struct UserFailRequest
 
 public static partial class CustomHTTP
 {
-    public static async void Profile(string userName, Action<UserDataModel> result, Action<UserFailRequest> error)
+    public static async void GetProfileByName(string userName, Action<UserDataModel> result, Action<UserFailRequest> error)
     {
         var url = CustomHTTP.DOMAIN + $"/users/username/{userName}/profile";
+        var response = await GET(url);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            error.Invoke(JsonUtility.FromJson<UserFailRequest>(content));
+        else
+            result.Invoke(JsonUtility.FromJson<UserDataModel>(content));
+    }
+
+    public static async void GetProfileByID(string userId, Action<UserDataModel> result, Action<UserFailRequest> error)
+    {
+        var url = CustomHTTP.DOMAIN + $"/users/username/{userId}/profile";
         var response = await GET(url);
 
         var content = await response.Content.ReadAsStringAsync();

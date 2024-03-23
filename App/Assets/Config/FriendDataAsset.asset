@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e6f1c1aec2938f94f826e0bc45d22a94, type: 3}
   m_Name: FriendDataAsset
   m_EditorClassIdentifier: 
+  userDataAsset: {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
   friendList:
   - id: chim
     username: chim

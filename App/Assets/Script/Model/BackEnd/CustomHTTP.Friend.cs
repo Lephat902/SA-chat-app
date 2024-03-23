@@ -55,7 +55,7 @@ public static partial class CustomHTTP
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Debug.Log("Result: " + content + " " + content.Length);
+        Debug.Log("Result: " + content);
 
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
@@ -101,9 +101,6 @@ public static partial class CustomHTTP
             var ret = new List<FriendDataModel>();
             var listRequestDataModel = JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}");
             var requestDataModels = listRequestDataModel.list;
-
-            Debug.LogError(JsonUtility.ToJson(listRequestDataModel));
-            Debug.LogError(JsonUtility.ToJson(requestDataModels));
 
             for (int i = 0; i < requestDataModels.Count; i++)
                 ret.Add(requestDataModels[i].requester);

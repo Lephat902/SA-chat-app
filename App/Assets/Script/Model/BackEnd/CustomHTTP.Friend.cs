@@ -132,7 +132,7 @@ public static partial class CustomHTTP
 
     public static async void RefuseRequestFriend(string accessToken, string id, Action<bool> result)
     {
-        var url = DOMAIN + $"/users/friend-requests/{id}/reject";
+        var url = DOMAIN + $"/users/received-requests/{id}/reject";
         var response = await PUT(url, accessToken);
 
         var content = await response.Content.ReadAsStringAsync();

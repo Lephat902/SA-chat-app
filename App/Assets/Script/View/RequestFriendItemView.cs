@@ -10,6 +10,7 @@ public class RequestFriendItemView : FriendItemView
     [SerializeField] private FriendDataAsset friendDataAsset;
     [SerializeField] private Button acceptButton;
     [SerializeField] private Button refuseButton;
+    private string requestId;
 
     private void Start()
     {
@@ -23,22 +24,24 @@ public class RequestFriendItemView : FriendItemView
         refuseButton.onClick.RemoveAllListeners();
     }
 
+    public void SetID(string id) => requestId = id;
+
     private void AcceptRequestFriend()
     {
-        CustomHTTP.AcceptRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
+        CustomHTTP.AcceptRequestFriend(userDataAsset.AccessToken, requestId,
             (result) =>
             {
-                FriendController.OnAcceptRequest.Invoke(friendDataModel.id);
+                FriendController.OnAcceptRequest.Invoke(requestId);
                 gameObject.SetActive(false);
             });
     }
 
     private void RefuseRequestFriend()
     {
-        CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
+        CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, requestId,
            (result) =>
            {
-               FriendController.OnRefuseRequest.Invoke(friendDataModel.id);
+               FriendController.OnRefuseRequest.Invoke(requestId);
                gameObject.SetActive(false);
            });
     }

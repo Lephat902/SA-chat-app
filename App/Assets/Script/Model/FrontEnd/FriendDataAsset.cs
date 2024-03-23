@@ -9,7 +9,7 @@ class FriendDataAsset : ScriptableObject
 {
     [SerializeField] private UserDataAsset userDataAsset;
     [SerializeField] private List<FriendDataModel> friendList;
-    [SerializeField] private List<FriendDataModel> requestList;
+    [SerializeField] private List<RequestDataModel> requestList;
 
     public List<FriendDataModel> FriendList
     {
@@ -17,7 +17,7 @@ class FriendDataAsset : ScriptableObject
         set { friendList = value; }
     }
 
-    public List<FriendDataModel> RequestList
+    public List<RequestDataModel> RequestList
     {
         get { return requestList; }
         set { requestList = value; }

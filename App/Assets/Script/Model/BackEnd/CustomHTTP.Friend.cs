@@ -85,7 +85,7 @@ public static partial class CustomHTTP
         }
     }
 
-    public static async void GetRequestFriend(string accessToken, Action<List<FriendDataModel>> result, Action<FriendFailRequest> error)
+    public static async void GetRequestFriend(string accessToken, Action<List<RequestDataModel>> result, Action<FriendFailRequest> error)
     {
         var url = DOMAIN + $"/users/received-requests";
         var response = await GET(url, accessToken);
@@ -97,16 +97,7 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
         else
-        {
-            var ret = new List<FriendDataModel>();
-            var listRequestDataModel = JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}");
-            var requestDataModels = listRequestDataModel.list;
-
-            for (int i = 0; i < requestDataModels.Count; i++)
-                ret.Add(requestDataModels[i].requester);
-
-            result.Invoke(ret);
-        }
+            result.Invoke(JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}").list);
     }
 
     public static async void SendRequestFriend(string accessToken, string id, Action<bool> result)

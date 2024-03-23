@@ -24,7 +24,11 @@ public class RequestFriendItemView : FriendItemView
         refuseButton.onClick.RemoveAllListeners();
     }
 
-    public void SetID(string id) => requestId = id;
+    public void SetUI(FriendDataModel friendDataModel, string idRequest)
+    {
+        base.SetUI(friendDataModel);
+        requestId = idRequest;
+    }
 
     private void AcceptRequestFriend()
     {
@@ -41,6 +45,7 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, requestId,
            (result) =>
            {
+               Debug.Log(result);
                if (result)
                    FriendController.OnRefuseRequest.Invoke(requestId);
            });

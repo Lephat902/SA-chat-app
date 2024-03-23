@@ -134,6 +134,8 @@ public class FriendController : MonoBehaviour
 
     private void SetUIRequest()
     {
+        Debug.Log("Refresh UI Request");
+
         if (friendDataAsset.RequestList == null)
             return;
 
@@ -150,8 +152,7 @@ public class FriendController : MonoBehaviour
             else
             {
                 var newItem = Instantiate(friendRequestItemObj, friendRequestContentObj);
-                newItem.SetUI(requestData.requester);
-                newItem.SetID(requestData.id);
+                newItem.SetUI(requestData.requester, requestData.id);
                 listFriendRequest.Add(newItem);
             }
         }
@@ -219,11 +220,13 @@ public class FriendController : MonoBehaviour
 
     private void RefuseRequest(string id)
     {
-        foreach (var friendDataModel in friendDataAsset.RequestList)
+        Debug.Log("Refuse");
+
+        foreach (var requestDataModel in friendDataAsset.RequestList)
         {
-            if (friendDataModel.id == id)
+            if (requestDataModel.id == id)
             {
-                friendDataAsset.RequestList.Remove(friendDataModel);
+                friendDataAsset.RequestList.Remove(requestDataModel);
                 SetUIRequest();
                 return;
             }

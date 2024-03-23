@@ -27,21 +27,15 @@ partial class CustomSocket : MonoBehaviour
 {
     private void StartFriend()
     {
-        socket.On("FriendRequestCreatedEvent", (response) =>
-        {
-            HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(response.ToString()));
-        });
-
-        socket.On("friend-request-sent",
+        socket.OnUnityThread("friend-request-sent",
             res => HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(res.ToString())));
 
-        socket.On("friend-request-updated",
+        socket.OnUnityThread("friend-request-updated",
             res => HandleFriendMessageUpdate(JsonUtility.FromJson<FriendMessageUpdate>(res.ToString())));
     }
 
     private void HandleFriendMessageRequest(FriendMessageRequest friendMessageRequest)
     {
-        Debug.LogError("chim");
         if (friendMessageRequest.recipientId == userDataAsset.UserDataModel.id)
             FriendController.OnIsAddedRequest.Invoke(friendMessageRequest.requesterId);
     }

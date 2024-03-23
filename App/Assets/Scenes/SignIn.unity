@@ -412,6 +412,7 @@ MonoBehaviour:
   signInButton: {fileID: 1198343902}
   signInSwitch: {fileID: 1198343901}
   statusText: {fileID: 1925072089}
+  customSocket: {fileID: 380003625}
   userDataAsset: {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
   friendDataAsset: {fileID: 11400000, guid: 398e66f6fc4e5ea48bb5232db4245c18, type: 2}
 --- !u!1001 &1198343899

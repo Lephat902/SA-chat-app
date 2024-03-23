@@ -31,8 +31,8 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.AcceptRequestFriend(userDataAsset.AccessToken, requestId,
             (result) =>
             {
-                FriendController.OnAcceptRequest.Invoke(requestId);
-                gameObject.SetActive(false);
+                if (result)
+                    FriendController.OnAcceptRequest.Invoke(requestId);
             });
     }
 
@@ -41,8 +41,8 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, requestId,
            (result) =>
            {
-               FriendController.OnRefuseRequest.Invoke(requestId);
-               gameObject.SetActive(false);
+               if (result)
+                   FriendController.OnRefuseRequest.Invoke(requestId);
            });
     }
 }

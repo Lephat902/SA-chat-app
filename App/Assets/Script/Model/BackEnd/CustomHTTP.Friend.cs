@@ -18,17 +18,20 @@ public struct FriendDataModel
     public bool isOnline;
 }
 
-[Serializable]
 public struct SearchFriendDataModel
 {
     public List<FriendDataModel> results;
     public int totalCount;
 }
 
-[Serializable]
-public struct RequestFriendDataModel
+public struct ListRequestDataModel
 {
-    public List<FriendDataModel> requester;
+    public List<RequestDataModel> list;
+}
+
+public struct RequestDataModel
+{
+    public FriendDataModel requester;
 }
 
 public struct FriendFailRequest
@@ -88,7 +91,14 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
         else
-            result.Invoke(JsonUtility.FromJson<RequestFriendDataModel>("{ \"list\": " + content + "}").requester);
+        {
+            var ret = new List<FriendDataModel>();
+            var requestDataModels = JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}").list;
+            for (int i = 0; i < requestDataModels.Count; i++)
+                ret.Add(requestDataModels[i].requester);
+
+            result.Invoke(ret);
+        }
     }
 
     public static async void SendRequestFriend(string accessToken, string id, Action<bool> result)

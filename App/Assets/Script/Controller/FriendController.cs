@@ -146,7 +146,7 @@ public class FriendController : MonoBehaviour
             if (i < listFriendRequest.Count)
             {
                 listFriendRequest[i].gameObject.SetActive(true);
-                listFriendRequest[i].SetUI(requestData.requester);
+                listFriendRequest[i].SetUI(requestData.requester, requestData.id);
             }
 
             else
@@ -220,8 +220,6 @@ public class FriendController : MonoBehaviour
 
     private void RefuseRequest(string id)
     {
-        Debug.Log("Refuse");
-
         foreach (var requestDataModel in friendDataAsset.RequestList)
         {
             if (requestDataModel.id == id)

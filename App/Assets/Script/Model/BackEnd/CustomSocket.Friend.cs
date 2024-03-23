@@ -29,7 +29,7 @@ partial class CustomSocket : MonoBehaviour
     {
         socket.On("FriendRequestCreatedEvent", (response) =>
         {
-            HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(res.ToString()));
+            HandleFriendMessageRequest(JsonUtility.FromJson<FriendMessageRequest>(response.ToString()));
         });
 
         socket.On("friend-request-sent",

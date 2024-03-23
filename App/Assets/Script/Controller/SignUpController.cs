@@ -121,12 +121,14 @@ public class SignUpController : MonoBehaviour
     {
         ActionAllButton(false);
 
-        CustomHTTP.Profile(userName,
-            (res) =>
+        CustomHTTP.GetProfileByName(userName,
+            async (res) =>
             {
                 userDataAsset.UserDataModel = res;
 
                 statusText.text = "Loading to Home!";
+
+                await friendDataAsset.StartLoad();
 
                 SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },

@@ -5,9 +5,4 @@ using UnityEngine;
 public class RuntimeDataController : MonoBehaviour
 {
     [SerializeField] private List<ScriptableObject> scriptableObjects;
-    
-    void Start()
-    {
-        DontDestroyOnLoad(gameObject);
-    }
 }

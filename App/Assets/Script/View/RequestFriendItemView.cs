@@ -28,17 +28,8 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.AcceptRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
             (result) =>
             {
-                foreach(var friendDataModel in friendDataAsset.RequestList)
-                {
-                    if(friendDataModel.id == this.friendDataModel.id)
-                    {
-                        friendDataAsset.RequestList.Remove(friendDataModel);
-                        friendDataAsset.FriendList.Add(friendDataModel);
-                        FriendController.OnChangeFriend.Invoke();
-                        gameObject.SetActive(false);
-                        return;
-                    }
-                }
+                FriendController.OnAcceptRequest.Invoke(friendDataModel.id);
+                gameObject.SetActive(false);
             });
     }
 
@@ -47,15 +38,8 @@ public class RequestFriendItemView : FriendItemView
         CustomHTTP.RefuseRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
            (result) =>
            {
-               foreach (var friendDataModel in friendDataAsset.RequestList)
-               {
-                   if (friendDataModel.id == this.friendDataModel.id)
-                   {
-                       friendDataAsset.RequestList.Remove(friendDataModel);
-                       gameObject.SetActive(false);
-                       return;
-                   }
-               }
+               FriendController.OnRefuseRequest.Invoke(friendDataModel.id);
+               gameObject.SetActive(false);
            });
     }
 }

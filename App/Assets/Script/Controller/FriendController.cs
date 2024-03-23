@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -35,13 +36,23 @@ public class FriendController : MonoBehaviour
     [SerializeField] private FriendItemView friendRequestItemObj;
     [ReadOnly] [SerializeField] private List<FriendItemView> listFriendRequest = new();
 
-    public static UnityEvent OnChangeFriend = new();
+    public static UnityEvent<string> OnAcceptRequest = new();
+    public static UnityEvent<string> OnRefuseRequest = new();
+    public static UnityEvent<string> OnIsAddedRequest = new();
+    public static UnityEvent<string> OnIsAcceptedRequest = new();
+    public static UnityEvent<string> OnIsRefusedRequest = new();
 
     void Start()
     {
-        OnChangeFriend.AddListener(SetUIFriend);
+        OnAcceptRequest.AddListener(AcceptRequest);
+        OnRefuseRequest.AddListener(RefuseRequest);
+        OnIsAddedRequest.AddListener(IsAddedRequest);
+        OnIsAcceptedRequest.AddListener(IsAcceptedRequest);
+        OnIsRefusedRequest.AddListener(IsRefusedRequest);
+
         OpenTap(friendCanvasGroup);
-        LoadDataFriend();
+        SetUIFriend();
+        SetUIRequest();
 
         friendOpenBtn.onClick.AddListener(OpenFriend);
         friendSearchOpenBtn.onClick.AddListener(OpenFriendSearch);
@@ -51,43 +62,17 @@ public class FriendController : MonoBehaviour
 
     private void OnDestroy()
     {
+        OnAcceptRequest.RemoveAllListeners();
+        OnRefuseRequest.RemoveAllListeners();
+        OnIsAddedRequest.RemoveAllListeners();
+        OnIsAcceptedRequest.RemoveAllListeners();
+        OnIsRefusedRequest.RemoveAllListeners();
+
         friendOpenBtn.onClick.RemoveAllListeners();
         friendSearchOpenBtn.onClick.RemoveAllListeners();
         friendRequestOpenBtn.onClick.RemoveAllListeners();
         friendSearchBtn.onClick.RemoveAllListeners();
     }
-
-    #region Load Data
-
-    private void LoadDataFriend()
-    {
-        LoadFriend();
-        LoadRequest();
-    }
-
-    private void LoadFriend()
-    {
-        CustomHTTP.GetFriend(userDataAsset.AccessToken,
-            (res) =>
-            {
-                friendDataAsset.FriendList = res;
-                SetUIFriend();
-            },
-            (err) => { Debug.LogError("Error Load Friend"); });
-    }
-
-    private void LoadRequest()
-    {
-        CustomHTTP.GetRequestFriend(userDataAsset.AccessToken,
-            (res) =>
-            {
-                friendDataAsset.RequestList = res;
-                SetUIRequest();
-            },
-            (err) => { Debug.LogError("Error Load Friend Request"); });
-    }
-
-    #endregion
 
     #region SetUI
 
@@ -213,5 +198,82 @@ public class FriendController : MonoBehaviour
             (res) => { SetUISearch(res); },
             (err) => { });
     }
+    #endregion
+
+    #region ActionStatic
+    private void AcceptRequest(string id)
+    {
+        foreach (var friendDataModel in friendDataAsset.RequestList)
+        {
+            if (friendDataModel.id == id)
+            {
+                friendDataAsset.RequestList.Remove(friendDataModel);
+                friendDataAsset.FriendList.Add(friendDataModel);
+                SetUIRequest();
+                SetUIFriend();
+                return;
+            }
+        }
+    }
+
+    private void RefuseRequest(string id)
+    {
+        foreach (var friendDataModel in friendDataAsset.RequestList)
+        {
+            if (friendDataModel.id == id)
+            {
+                friendDataAsset.RequestList.Remove(friendDataModel);
+                SetUIRequest();
+                return;
+            }
+        }
+    }
+
+    private void IsAddedRequest(string id)
+    {
+        foreach (var friendDataModel in friendDataAsset.RequestList)
+            if (friendDataModel.id == id)
+                return;
+
+        CustomHTTP.GetProfileByID(id,
+            (res) =>
+            {
+                var friendDataModel = new FriendDataModel
+                {
+                    id = res.id,
+                    username = res.username,
+                    avatar = res.avatar
+                };
+
+                friendDataAsset.RequestList.Add(friendDataModel);
+                SetUIRequest();
+            },
+            (err) => { });
+    }
+
+    private void IsAcceptedRequest(string id)
+    {
+        foreach (var friendDataModel in friendDataAsset.FriendList)
+            if (friendDataModel.id == id)
+                return;
+
+        CustomHTTP.GetProfileByID(id,
+            (res) =>
+            {
+                var friendDataModel = new FriendDataModel
+                {
+                    id = res.id,
+                    username = res.username,
+                    avatar = res.avatar
+                };
+
+                friendDataAsset.FriendList.Add(friendDataModel);
+                SetUIFriend();
+            },
+            (err) => { });
+    }
+
+    private void IsRefusedRequest(string id){}
+
     #endregion
 }

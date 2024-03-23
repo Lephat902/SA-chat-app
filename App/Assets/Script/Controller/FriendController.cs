@@ -33,8 +33,8 @@ public class FriendController : MonoBehaviour
     [SerializeField] private Button friendRequestOpenBtn;
     [SerializeField] private CanvasGroup friendRequestCanvasGroup;
     [SerializeField] private Transform friendRequestContentObj;
-    [SerializeField] private FriendItemView friendRequestItemObj;
-    [ReadOnly] [SerializeField] private List<FriendItemView> listFriendRequest = new();
+    [SerializeField] private RequestFriendItemView friendRequestItemObj;
+    [ReadOnly] [SerializeField] private List<RequestFriendItemView> listFriendRequest = new();
 
     public static UnityEvent<string> OnAcceptRequest = new();
     public static UnityEvent<string> OnRefuseRequest = new();
@@ -139,18 +139,19 @@ public class FriendController : MonoBehaviour
 
         for (int i = 0; i < friendDataAsset.RequestList.Count; i++)
         {
-            var friendData = friendDataAsset.RequestList[i];
+            var requestData = friendDataAsset.RequestList[i];
 
             if (i < listFriendRequest.Count)
             {
-                listFriendRequest[i].SetUI(friendData);
+                listFriendRequest[i].SetUI(requestData.requester);
                 listFriendRequest[i].gameObject.SetActive(true);
             }
 
             else
             {
                 var newItem = Instantiate(friendRequestItemObj, friendRequestContentObj);
-                newItem.SetUI(friendData);
+                newItem.SetUI(requestData.requester);
+                newItem.SetID(requestData.id);
                 listFriendRequest.Add(newItem);
             }
         }
@@ -203,12 +204,12 @@ public class FriendController : MonoBehaviour
     #region ActionStatic
     private void AcceptRequest(string id)
     {
-        foreach (var friendDataModel in friendDataAsset.RequestList)
+        foreach (var requestDataModel in friendDataAsset.RequestList)
         {
-            if (friendDataModel.id == id)
+            if (requestDataModel.id == id)
             {
-                friendDataAsset.RequestList.Remove(friendDataModel);
-                friendDataAsset.FriendList.Add(friendDataModel);
+                friendDataAsset.RequestList.Remove(requestDataModel);
+                friendDataAsset.FriendList.Add(requestDataModel.requester);
                 SetUIRequest();
                 SetUIFriend();
                 return;
@@ -245,7 +246,7 @@ public class FriendController : MonoBehaviour
                     avatar = res.avatar
                 };
 
-                friendDataAsset.RequestList.Add(friendDataModel);
+                friendDataAsset.RequestList.Add(new RequestDataModel() { id = id, requester = friendDataModel });
                 SetUIRequest();
             },
             (err) => { });
@@ -273,7 +274,7 @@ public class FriendController : MonoBehaviour
             (err) => { });
     }
 
-    private void IsRefusedRequest(string id){}
+    private void IsRefusedRequest(string id) { }
 
     #endregion
 }

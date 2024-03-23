@@ -134,8 +134,6 @@ public class FriendController : MonoBehaviour
 
     private void SetUIRequest()
     {
-        Debug.Log("Refresh UI Request");
-
         if (friendDataAsset.RequestList == null)
             return;
 

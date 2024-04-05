@@ -17,9 +17,9 @@ public struct ChatCreate
 public struct ChatReceive
 {
     public string id;
-    public string text;
-    public string conversationId;
     public string userId;
+    public string conversationId;
+    public string text;
     public string createdAt;
 }
 
@@ -28,10 +28,10 @@ partial class CustomSocket : MonoBehaviour
     private void StartChat()
     {
         socket.OnUnityThread("conversation-created",
-            res => HandleConversationCreated(JsonUtility.FromJson<ChatCreate>(res.ToString())));
+            res => HandleConversationCreated(CustomJson<ChatCreate>.ParseList(res.ToString())[0]));
 
         socket.OnUnityThread("receive-message",
-            res => HandleReceiveMessage(JsonUtility.FromJson<ChatReceive>(res.ToString())));
+            res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));
     }
 
     private void HandleConversationCreated(ChatCreate chatCreate)
@@ -39,7 +39,10 @@ partial class CustomSocket : MonoBehaviour
         ChatController.OnConversationCreate.Invoke(new ConversationDataModel()
         {
             id = chatCreate.conversationId,
-            users = chatCreate.membersIdsList
+            createdAt = "chim",
+            users = chatCreate.membersIdsList,
+            messages = new(),
+            userConversations = new()
         });
     }
 
@@ -49,8 +52,8 @@ partial class CustomSocket : MonoBehaviour
             chatReceive.conversationId,
             new ChatDataModel()
             {
-                id = chatReceive.userId,
-                user = "Chim",
+                id = chatReceive.id,
+                user = chatReceive.userId,
                 conversation = chatReceive.text,
                 lastReadMessage = "Chim"
             });
@@ -58,8 +61,7 @@ partial class CustomSocket : MonoBehaviour
 
     public static void SendChatMessage(string conversationId, string text)
     {
-        var message = string.Format("{\"text\": {0}, \"conversationId\": {1}}", text, conversationId);
-        Debug.Log("Send message: " + message);
+        var message = "{\"text\": \"" + text + "\", \"conversationId\": \"" + conversationId + "\"}";
         socket.EmitStringAsJSON("send-message", message);
     }
 }

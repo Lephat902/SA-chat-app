@@ -62,4 +62,19 @@ public static partial class CustomHTTP
         else
             result.Invoke(CustomJson<ConversationDataModel>.ParseList(content));
     }
+
+    public static async void GetConversation(string accessToken, string conversationId, Action<ConversationDataModel> result, Action error)
+    {
+        var url = DOMAIN + $"/conversations/";
+        var response = await GET(url + conversationId, accessToken);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            error.Invoke();
+        else
+            result.Invoke(JsonUtility.FromJson<ConversationDataModel>(content));
+    }
 }

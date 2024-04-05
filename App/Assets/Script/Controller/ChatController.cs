@@ -101,7 +101,7 @@ public class ChatController : MonoBehaviour
                 chatDataModels = chatDataAsset.ConversationList[i].userConversations;
 
         if (chatDataModels == null)
-            return;
+            chatDataModels = new();
 
         curConversationId = conversationId;
 

@@ -679,6 +679,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1166273311}
     m_Modifications:
+    - target: {fileID: 3224864698014525826, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4271430890410279634, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5449255483203299196, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_Name
       value: ChatController
@@ -697,27 +705,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_AnchorMax.x
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0.5
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_AnchorMin.x
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0.5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 100
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_LocalPosition.x

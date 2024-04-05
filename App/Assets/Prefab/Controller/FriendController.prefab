@@ -57,7 +57,7 @@ MonoBehaviour:
   friendOpenBtn: {fileID: 1882964657}
   friendCanvasGroup: {fileID: 3062886758980528153}
   friendContentObj: {fileID: 1370018301}
-  friendItemObj: {fileID: 4164348099058665987, guid: a7b960195388c3d40b955d6b5ad93dbb, type: 3}
+  friendItemObj: {fileID: 9201913171695612398, guid: fcee4fb2705d22549b8b55f429d6d905, type: 3}
   listFriend: []
   friendSearchOpenBtn: {fileID: 838382856534366913}
   friendSearchCanvasGroup: {fileID: 2387760490516443241}

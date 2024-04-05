@@ -691,6 +691,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: ChatController
       objectReference: {fileID: 0}
+    - target: {fileID: 6282930564213962778, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
+      propertyPath: m_BlocksRaycasts
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7218893972526817326, guid: b3958f53918b4ba47ad265dbf814bfc5, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

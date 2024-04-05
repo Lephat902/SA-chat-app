@@ -65,8 +65,18 @@ class ChatDataAsset : ScriptableObject
     private void LoadConversation()
     {
         CustomHTTP.GetConversation(userDataAsset.AccessToken,
-            (res) => { conversationList = res; },
-            () => { Debug.LogError("Error Load Conversation"); });
+            (res1) =>
+            {
+                var list = new List<ConversationDataModel>();
+                if (res1 != null)
+                    for (int i = 0; i < res1.Count; i++)
+                        CustomHTTP.GetConversation(userDataAsset.AccessToken,
+                                                    res1[i].id,
+                                                    (res2) => { list.Add(res2); },
+                                                    () => { Debug.LogError("Can't Load Conversation"); });
+                conversationList = list;
+            },
+            () => { Debug.LogError("Error Load All Conversations"); });
     }
 }
 

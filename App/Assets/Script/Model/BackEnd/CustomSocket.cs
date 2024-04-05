@@ -10,7 +10,7 @@ partial class CustomSocket : MonoBehaviour
     [SerializeField] private UserDataAsset userDataAsset;
 
     private const string DOMAIN = "https://chatapp.tutorify.site";
-    private SocketIOUnity socket;
+    private static SocketIOUnity socket;
 
     // Start is called before the first frame update
     public void StartConnect()
@@ -28,5 +28,6 @@ partial class CustomSocket : MonoBehaviour
         socket.Connect();
 
         StartFriend();
+        StartChat();
     }
 }

@@ -30,6 +30,7 @@ public class SignUpController : MonoBehaviour
     [Header("Data")]
     [SerializeField] private UserDataAsset userDataAsset;
     [SerializeField] private FriendDataAsset friendDataAsset;
+    [SerializeField] private ChatDataAsset chatDataAsset;
 
     void Start()
     {
@@ -132,6 +133,7 @@ public class SignUpController : MonoBehaviour
                 statusText.text = "Loading to Home!";
 
                 await friendDataAsset.StartLoad();
+                await chatDataAsset.StartLoad();
 
                 SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },

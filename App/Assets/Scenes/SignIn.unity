@@ -267,6 +267,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   scriptableObjects:
   - {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
+  - {fileID: 11400000, guid: 398e66f6fc4e5ea48bb5232db4245c18, type: 2}
+  - {fileID: 11400000, guid: 725ae65ca09b5d74bb8621fb497a222e, type: 2}
 --- !u!4 &1023810296
 Transform:
   m_ObjectHideFlags: 0
@@ -415,6 +417,7 @@ MonoBehaviour:
   customSocket: {fileID: 380003625}
   userDataAsset: {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
   friendDataAsset: {fileID: 11400000, guid: 398e66f6fc4e5ea48bb5232db4245c18, type: 2}
+  chatDataAsset: {fileID: 11400000, guid: 725ae65ca09b5d74bb8621fb497a222e, type: 2}
 --- !u!1001 &1198343899
 PrefabInstance:
   m_ObjectHideFlags: 0

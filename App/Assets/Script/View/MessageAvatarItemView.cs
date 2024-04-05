@@ -10,7 +10,6 @@ using UnityEngine.UI;
 
 class MessageAvatarItemView : MonoBehaviour
 {
-    [SerializeField] private FriendDataAsset friendDataAsset;
     [SerializeField] private Image image;
     [SerializeField] private GameObject imageActive;
     [SerializeField] private Button button;
@@ -19,12 +18,8 @@ class MessageAvatarItemView : MonoBehaviour
 
     public void SetUp(ConversationDataModel conversationDataModel)
     {
-        for (int i = 0; i < friendDataAsset.FriendList.Count; i++)
-            if (conversationDataModel.users.Contains(friendDataAsset.FriendList[i].id))
-            {
-                StartCoroutine(LoadImage(friendDataAsset.FriendList[i].avatar));
-                break;
-            }
+
+        StartCoroutine(LoadImage(conversationDataModel.avatar));
 
         this.conversationDataModel = conversationDataModel;
 
@@ -53,7 +48,7 @@ class MessageAvatarItemView : MonoBehaviour
     {
         if (conversationDataModel.id == ChatController.CurConversationId && !imageActive.activeInHierarchy)
             imageActive.SetActive(true);
-        else if(conversationDataModel.id != ChatController.CurConversationId && imageActive.activeInHierarchy)
+        else if (conversationDataModel.id != ChatController.CurConversationId && imageActive.activeInHierarchy)
             imageActive.SetActive(false);
     }
 }

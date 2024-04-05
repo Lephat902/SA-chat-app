@@ -18,7 +18,10 @@ public struct ConversationDataModel
 {
     public string id;
     public string createdAt;
-    public List<string> users;
+    public string name;
+    public string description;
+    public string avatar;
+    public List<ConversationUserDataModel> users;
     public List<string> messages;
     public List<ChatDataModel> userConversations;
 }
@@ -30,6 +33,15 @@ public struct ChatDataModel
     public string user;
     public string conversation;
     public string lastReadMessage;
+}
+
+[Serializable]
+public struct ConversationUserDataModel
+{
+    public string id;
+    public string username;
+    public string avatar;
+    public bool isOnline;
 }
 
 

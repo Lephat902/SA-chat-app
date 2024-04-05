@@ -36,14 +36,10 @@ partial class CustomSocket : MonoBehaviour
 
     private void HandleConversationCreated(ChatCreate chatCreate)
     {
-        ChatController.OnConversationCreate.Invoke(new ConversationDataModel()
-        {
-            id = chatCreate.conversationId,
-            createdAt = "chim",
-            users = chatCreate.membersIdsList,
-            messages = new(),
-            userConversations = new()
-        });
+        CustomHTTP.GetConversation(userDataAsset.AccessToken,
+                                    chatCreate.conversationId,
+                                    (res) => { ChatController.OnConversationCreate.Invoke(res); },
+                                    () => { Debug.LogError("Can't Load Conversation"); });
     }
 
     private void HandleReceiveMessage(ChatReceive chatReceive)

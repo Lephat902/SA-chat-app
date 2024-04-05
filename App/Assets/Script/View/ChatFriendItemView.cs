@@ -28,9 +28,9 @@ public class ChatFriendItemView : FriendItemView
             CustomHTTP.CreateConversation(userDataAsset.AccessToken,
                 new CreateConversationDataModel()
                 {
-                    name = "chim",
+                    name = friendDataModel.username,
                     description = "chim",
-                    avatar = "chim.com",
+                    avatar = friendDataModel.avatar,
                     initialMembers = new() { friendDataModel.id }
                 },
                 () => Chat());
@@ -43,9 +43,13 @@ public class ChatFriendItemView : FriendItemView
         for (int i = 0; i < chatDataAsset.ConversationList.Count; i++)
         {
             var conversationData = chatDataAsset.ConversationList[i];
-            if (conversationData.users.Count == 2
-                && conversationData.users.Contains(userDataAsset.UserDataModel.id)
-                && conversationData.users.Contains(otherId))
+            int check = 0;
+            if (conversationData.users.Count == 2)
+                for (int j = 0; j < conversationData.users.Count; j++)
+                    if (conversationData.users[j].id == userDataAsset.UserDataModel.id || conversationData.users[j].id == otherId)
+                        check++;
+            
+            if (check == 2)
                 return conversationData.id;
         }
 

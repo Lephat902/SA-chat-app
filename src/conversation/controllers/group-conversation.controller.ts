@@ -4,6 +4,7 @@ import { CreateGroupConversationDto, UpdateGroupConversationDto } from '../dtos'
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiTags, ApiResponse } from '@nestjs/swagger';
 import { GroupConversationService } from '../services/group-conversation.service';
+import { GroupConversation } from '../entities';
 
 @Controller('/conversations/groups')
 @ApiTags('Group Conversation')
@@ -18,7 +19,7 @@ export class GroupConversationController {
   async createGroupConversation(
     @Req() req: RequestWithUser,
     @Body() createGroupConversationDto: CreateGroupConversationDto,
-  ) {
+  ): Promise<GroupConversation> {
     createGroupConversationDto.adminId = req.user.id;
     return this.groupConversationService.createGroupConversation(createGroupConversationDto);
   }

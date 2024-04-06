@@ -33,7 +33,7 @@ export class GroupConversationService {
     private readonly eventEmitter: EventEmitter2,
   ) { }
 
-  async createGroupConversation(createGroupConversationDto: CreateGroupConversationDto) {
+  async createGroupConversation(createGroupConversationDto: CreateGroupConversationDto): Promise<GroupConversation> {
     const { adminId } = createGroupConversationDto;
     const initialMembers: string[] = getArrayWithUniqueElements(createGroupConversationDto.initialMembers);
     if (!adminId) {
@@ -61,6 +61,8 @@ export class GroupConversationService {
         .membersIdsList([adminId, ...initialMembers])
         .build()
     );
+
+    return newConversation;
   }
 
   async removeGroupConversation(id: string, userIdMakeRequest: string) {

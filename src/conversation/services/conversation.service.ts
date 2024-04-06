@@ -66,21 +66,23 @@ export class ConversationService {
   async findAllConversationsWithRelationsByUserId(queryConversationDto: Readonly<QueryConversationDto>)
     : Promise<(DirectConversationItemQueryResponse | GroupConversationItemQueryResponse)[]> {
     const { userId, page = 1, limit = 10 } = queryConversationDto;
+    console.log(queryConversationDto);
     // Constructing the query
     const queryBuilder = this.conversationRepository.createQueryBuilder('conversation')
       // Exclude the user with the specified userId out of the response
       .leftJoinAndSelect('conversation.users', 'user', 'user.id != :userId', { userId })
       // Ensure the conversation includes the specified userId
-      .where(qb => {
+      .andWhere(qb => {
         const idsOfConversationsIncludingUserQuery = qb.subQuery()
           .select('cuu.conversationId')
           .from('conversation_users_user', 'cuu')
           .where('cuu.userId = :userId', { userId })
           .getQuery();
+          console.log(idsOfConversationsIncludingUserQuery);
         return `conversation.id IN (${idsOfConversationsIncludingUserQuery})`;
       })
       .leftJoinAndSelect('conversation.messages', 'message')
-      .where(qb => {
+      .andWhere(qb => {
         const subQuery = qb.subQuery()
           .select('MAX(message.createdAt)')
           .from('Message', 'message')

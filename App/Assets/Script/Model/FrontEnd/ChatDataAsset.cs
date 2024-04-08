@@ -82,8 +82,9 @@ class ChatDataAsset : ScriptableObject
                 }
 
                 await UniTask.WaitUntil(() => wait == 0);
-
+                
                 conversationList = list;
+                Debug.Log("Done load chat data");
             },
             () => { Debug.LogError("Error Load All Conversations"); });
     }

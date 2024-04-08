@@ -135,6 +135,7 @@ public class SignUpController : MonoBehaviour
                 await friendDataAsset.StartLoad();
                 await chatDataAsset.StartLoad();
 
+                Debug.Log("Done load all data");
                 SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },
             (err) =>

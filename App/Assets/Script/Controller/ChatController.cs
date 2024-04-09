@@ -197,6 +197,8 @@ public class ChatController : MonoBehaviour
             return;
 
         CustomSocket.SendChatMessage(curConversationId, messageSendInput.text);
+
+        messageSendInput.text = "";
     }
 
     #endregion

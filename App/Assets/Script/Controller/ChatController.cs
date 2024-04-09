@@ -137,7 +137,9 @@ public class ChatController : MonoBehaviour
 
         await UniTask.DelayFrame(5);
         chatConversationContentObj.gameObject.SetActive(true);
-        ScrollUIToBottom();
+
+        await UniTask.DelayFrame(20);
+        scrollRect.normalizedPosition = new Vector2(0, 0);
     }
 
     private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
@@ -160,6 +162,7 @@ public class ChatController : MonoBehaviour
         {
             listChat[curConversationIndex + 1].gameObject.SetActive(true);
             listChat[curConversationIndex + 1].SetUp(chatDataModel);
+            curConversationIndex++;
         }
 
         else
@@ -173,11 +176,12 @@ public class ChatController : MonoBehaviour
         ScrollUIToBottom();
     }
 
-    private void ScrollUIToBottom()
+    private async void ScrollUIToBottom()
     {
+        await UniTask.DelayFrame(20);
         Debug.LogError(scrollRect.verticalNormalizedPosition);
         if (scrollRect.verticalNormalizedPosition <= 0.3)
-            scrollRect.normalizedPosition = new Vector2(0, -1f);
+            scrollRect.normalizedPosition = new Vector2(0, 0);
     }
 
     #endregion
@@ -235,7 +239,6 @@ public class ChatController : MonoBehaviour
     private void ChatMessageReceive(string conversationId, MessageConversationDataModel chatDataModel)
     {
         chatDataAsset.AddMessage(conversationId, chatDataModel, () => AddUIChat(conversationId, chatDataModel));
-
     }
 
     #endregion

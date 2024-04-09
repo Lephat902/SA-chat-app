@@ -46,7 +46,7 @@ public struct ConversationUserDataModel
 
 public static partial class CustomHTTP
 {
-    public static async void CreateConversation(string accessToken, CreateConversationDataModel createConversationDataModel, Action result)
+    public static async void CreateConversation(string accessToken, CreateConversationDataModel createConversationDataModel, Action<HeaderConversationDataModel> result)
     {
         var url = DOMAIN + "/conversations/groups";
         var response = await POST(url, createConversationDataModel, accessToken);
@@ -56,7 +56,7 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             Debug.LogError("Can't create conversation: " + content);
         else
-            Debug.Log("Create conversation success: " + content);
+            result.Invoke(JsonUtility.FromJson<HeaderConversationDataModel>(content));
     }
 
     public static async void GetConversation(string accessToken, Action<List<HeaderConversationDataModel>> result, Action error)

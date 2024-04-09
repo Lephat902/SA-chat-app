@@ -12,7 +12,7 @@ class ChatDataAsset : ScriptableObject
 
     public Dictionary<HeaderConversationDataModel, List<MessageConversationDataModel>> ConversationList => conversationList;
 
-    public bool AddConversation(HeaderConversationDataModel conversationDataModel)
+    public void AddConversation(HeaderConversationDataModel conversationDataModel, Action action = null)
     {
         if (conversationList == null)
             conversationList = new();
@@ -23,15 +23,16 @@ class ChatDataAsset : ScriptableObject
                 var messageData = conversationList[conversationData.Key];
                 conversationList.Remove(conversationData.Key);
                 conversationList.Add(conversationDataModel, messageData);
-                return false;
+                action?.Invoke();
+                return;
             }
 
 
         conversationList.Add(conversationDataModel, new List<MessageConversationDataModel>());
-        return true;
+        action?.Invoke();
     }
 
-    public bool AddMessage(string conversationId, MessageConversationDataModel chatDataModel)
+    public void AddMessage(string conversationId, MessageConversationDataModel chatDataModel, Action action = null)
     {
         if (conversationList == null)
             conversationList = new();
@@ -42,10 +43,12 @@ class ChatDataAsset : ScriptableObject
                 if (conversationData.Value.Count == 0)
                     CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
                                                     (res) => { conversationList[conversationData.Key] = res; },
-                                                    () => { Debug.LogError("Can't Load Conversation Message");});
+                                                    () => { Debug.LogError("Can't Load Conversation Message"); });
                 else
                     conversationData.Value.Add(chatDataModel);
-                return true;
+
+                action?.Invoke();
+                return;
             }
 
         conversationList.Add(new HeaderConversationDataModel()
@@ -56,8 +59,25 @@ class ChatDataAsset : ScriptableObject
             description = "chim",
             avatar = "chim",
             users = new List<ConversationUserDataModel>()
-        }, new List<MessageConversationDataModel>() { chatDataModel }); ;
-        return true;
+        }, new List<MessageConversationDataModel>() { chatDataModel });
+        action?.Invoke();
+    }
+
+    public void CheckAndLoadMessage(string conversationId, Action action = null)
+    {
+        if (conversationList == null)
+            conversationList = new();
+
+        foreach (var conversationData in conversationList)
+            if (conversationData.Key.id == conversationId)
+            {
+                if (conversationData.Value.Count == 0)
+                    CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
+                                                    (res) => { conversationList[conversationData.Key] = res; },
+                                                    () => { Debug.LogError("Can't Load Conversation Message"); });
+                action?.Invoke();
+                return;
+            }
     }
 
     public UniTask StartLoad()

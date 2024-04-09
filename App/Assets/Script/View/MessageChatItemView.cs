@@ -11,20 +11,20 @@ class MessageChatItemView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI myFakeTxt;
     [SerializeField] private TextMeshProUGUI myRealTxt;
 
-    public void SetUp(ChatDataModel chatDataModel)
+    public void SetUp(MessageConversationDataModel chatDataModel)
     {
-        if(chatDataModel.user == userDataAsset.UserDataModel.id)
+        if(chatDataModel.userId == userDataAsset.UserDataModel.id)
         {
             otherFakeTxt.gameObject.SetActive(false);
-            myFakeTxt.text = chatDataModel.conversation;
-            myRealTxt.text = chatDataModel.conversation;
+            myFakeTxt.text = chatDataModel.text;
+            myRealTxt.text = chatDataModel.text;
             myFakeTxt.gameObject.SetActive(true);
         }
         else
         {
             myFakeTxt.gameObject.SetActive(false);
-            otherFakeTxt.text = chatDataModel.conversation;
-            otherRealxt.text = chatDataModel.conversation;
+            otherFakeTxt.text = chatDataModel.text;
+            otherRealxt.text = chatDataModel.text;
             otherFakeTxt.gameObject.SetActive(true);
         }
     }

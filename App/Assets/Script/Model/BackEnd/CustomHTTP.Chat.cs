@@ -14,7 +14,7 @@ public struct CreateConversationDataModel
 }
 
 [Serializable]
-public struct ConversationDataModel
+public struct HeaderConversationDataModel
 {
     public string id;
     public string createdAt;
@@ -22,17 +22,16 @@ public struct ConversationDataModel
     public string description;
     public string avatar;
     public List<ConversationUserDataModel> users;
-    public List<string> messages;
-    public List<ChatDataModel> userConversations;
 }
 
 [Serializable]
-public struct ChatDataModel
+public struct MessageConversationDataModel
 {
     public string id;
-    public string user;
-    public string conversation;
-    public string lastReadMessage;
+    public string userId;
+    public string text;
+    public string createdAt;
+    public List<string> lastReadUsers;
 }
 
 [Serializable]
@@ -60,7 +59,7 @@ public static partial class CustomHTTP
             Debug.Log("Create conversation success: " + content);
     }
 
-    public static async void GetConversation(string accessToken, Action<List<ConversationDataModel>> result, Action error)
+    public static async void GetConversation(string accessToken, Action<List<HeaderConversationDataModel>> result, Action error)
     {
         var url = DOMAIN + $"/conversations";
         var response = await GET(url + $"?page=1&limit=10", accessToken);
@@ -72,10 +71,10 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             error.Invoke();
         else
-            result.Invoke(CustomJson<ConversationDataModel>.ParseList(content));
+            result.Invoke(CustomJson<HeaderConversationDataModel>.ParseList(content));
     }
 
-    public static async void GetConversation(string accessToken, string conversationId, Action<ConversationDataModel> result, Action error)
+    public static async void GetHeaderConversation(string accessToken, string conversationId, Action<HeaderConversationDataModel> result, Action error)
     {
         var url = DOMAIN + $"/conversations/";
         var response = await GET(url + conversationId, accessToken);
@@ -87,6 +86,21 @@ public static partial class CustomHTTP
         if (!response.IsSuccessStatusCode)
             error.Invoke();
         else
-            result.Invoke(JsonUtility.FromJson<ConversationDataModel>(content));
+            result.Invoke(JsonUtility.FromJson<HeaderConversationDataModel>(content));
+    }
+
+    public static async void GetMessageConversation(string accessToken, string conversationId, Action<List<MessageConversationDataModel>> result, Action error)
+    {
+        var url = DOMAIN + $"/conversations/";
+        var response = await GET(url + conversationId + "/messages?limit=10&dir=DESC", accessToken);
+
+        var content = await response.Content.ReadAsStringAsync();
+
+        Debug.Log("Result: " + content);
+
+        if (!response.IsSuccessStatusCode)
+            error.Invoke();
+        else
+            result.Invoke(CustomJson<MessageConversationDataModel>.ParseList(content));
     }
 }

@@ -42,7 +42,12 @@ class ChatDataAsset : ScriptableObject
             {
                 if (conversationData.Value.Count == 0)
                     CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
-                                                    (res) => { conversationList[conversationData.Key] = res; action?.Invoke(); },
+                                                    (res) =>
+                                                    {
+                                                        res.Reverse();
+                                                        conversationList[conversationData.Key] = res;
+                                                        action?.Invoke();
+                                                    },
                                                     () => { Debug.LogError("Can't Load Conversation Message"); });
                 else
                 {
@@ -77,7 +82,13 @@ class ChatDataAsset : ScriptableObject
             {
                 if (conversationData.Value.Count == 0)
                     CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
-                                                    (res) => { conversationList[conversationData.Key] = res; action?.Invoke(); isInvoke = true; },
+                                                    (res) =>
+                                                    {
+                                                        res.Reverse();
+                                                        conversationList[conversationData.Key] = res;
+                                                        action?.Invoke();
+                                                        isInvoke = true;
+                                                    },
                                                     () => { Debug.LogError("Can't Load Conversation Message"); });
 
                 if (!isInvoke)

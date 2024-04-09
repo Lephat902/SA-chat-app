@@ -50,8 +50,6 @@ class MessageChatItemView : MonoBehaviour
             mainRectTransform.sizeDelta = new Vector2(myFakeTransform.rect.width, myFakeTransform.rect.height);
         else
             mainRectTransform.sizeDelta = new Vector2(otherFakeTransform.rect.width, otherFakeTransform.rect.height);
-        
-        Debug.LogError("chim " + mainRectTransform.sizeDelta + " == " + myFakeTransform.sizeDelta + " == " + new Vector2(myFakeTransform.rect.width, myFakeTransform.rect.height));
     }
 }
 

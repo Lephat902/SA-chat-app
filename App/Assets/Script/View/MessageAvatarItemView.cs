@@ -18,6 +18,7 @@ class MessageAvatarItemView : MonoBehaviour
     [SerializeField] private GameObject imageActive;
     [SerializeField] private Button button;
     [SerializeField] private Sprite defaultSpite;
+    [SerializeField] private string curId;
     private HeaderConversationDataModel conversationDataModel;
 
     public void SetUp(HeaderConversationDataModel conversationDataModel)
@@ -36,6 +37,7 @@ class MessageAvatarItemView : MonoBehaviour
 
 
         this.conversationDataModel = conversationDataModel;
+        curId = conversationDataModel.id;
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OpenChat);

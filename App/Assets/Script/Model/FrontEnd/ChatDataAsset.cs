@@ -79,6 +79,8 @@ class ChatDataAsset : ScriptableObject
                                                     () => { Debug.LogError("Can't Load Conversation Message"); });
                 return;
             }
+
+        action?.Invoke();
     }
 
     public UniTask StartLoad()

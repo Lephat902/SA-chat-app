@@ -67,6 +67,8 @@ class ChatDataAsset : ScriptableObject
 
     public void CheckAndLoadMessage(string conversationId, Action action = null)
     {
+        bool isInvoke = false;
+
         if (conversationList == null)
             conversationList = new();
 
@@ -75,12 +77,17 @@ class ChatDataAsset : ScriptableObject
             {
                 if (conversationData.Value.Count == 0)
                     CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
-                                                    (res) => { conversationList[conversationData.Key] = res; action?.Invoke(); },
+                                                    (res) => { conversationList[conversationData.Key] = res; action?.Invoke(); isInvoke = true; },
                                                     () => { Debug.LogError("Can't Load Conversation Message"); });
+
+                if (!isInvoke)
+                    action.Invoke();
+
                 return;
             }
 
-        action?.Invoke();
+        if (!isInvoke)
+            action?.Invoke();
     }
 
     public UniTask StartLoad()

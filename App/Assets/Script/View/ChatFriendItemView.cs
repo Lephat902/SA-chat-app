@@ -33,7 +33,7 @@ public class ChatFriendItemView : FriendItemView
                     avatar = "chim.com",
                     initialMembers = new() { friendDataModel.id }
                 },
-                () => ChatController.OnConversationOpen.Invoke(existConversationId));
+                (res) => ChatController.OnConversationOpen.Invoke(res.id));
         else
             ChatController.OnConversationOpen.Invoke(existConversationId);
     }

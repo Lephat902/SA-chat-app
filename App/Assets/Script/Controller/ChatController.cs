@@ -38,7 +38,7 @@ public class ChatController : MonoBehaviour
     void Start()
     {
         SetUIAvatar();
-        
+
         isOn = true;
         OnOff();
 
@@ -68,7 +68,7 @@ public class ChatController : MonoBehaviour
             return;
 
         var i = 0;
-        foreach(var conversationData in chatDataAsset.ConversationList)
+        foreach (var conversationData in chatDataAsset.ConversationList)
         {
             var conversationDataModel = conversationData.Key;
 
@@ -129,8 +129,8 @@ public class ChatController : MonoBehaviour
         curConversationIndex = chatDataModels.Count - 1;
 
         if (listChat.Count > chatDataModels.Count)
-            for (int i = chatDataModels.Count; i < listAvatar.Count; i++)
-                listAvatar[i].gameObject.SetActive(false);
+            for (int i = chatDataModels.Count; i < listChat.Count; i++)
+                listChat[i].gameObject.SetActive(false);
     }
 
     private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
@@ -203,21 +203,21 @@ public class ChatController : MonoBehaviour
         if (!isOn)
             OnOff();
 
-        SetUIChat(conversationId);
+        chatDataAsset.CheckAndLoadMessage(conversationId, () => SetUIChat(conversationId));
+
         if (curConversationId != string.Empty && !sendMessageObj.activeInHierarchy)
             sendMessageObj.SetActive(true);
     }
 
     private void ConversationCreate(HeaderConversationDataModel conversationDataModel)
     {
-        chatDataAsset.AddConversation(conversationDataModel);
-        SetUIAvatar();
+        chatDataAsset.AddConversation(conversationDataModel, () => SetUIAvatar());
     }
 
     private void ChatMessageReceive(string conversationId, MessageConversationDataModel chatDataModel)
     {
-        chatDataAsset.AddMessage(conversationId, chatDataModel);
-        AddUIChat(conversationId, chatDataModel);
+        chatDataAsset.AddMessage(conversationId, chatDataModel, () => AddUIChat(conversationId, chatDataModel));
+
     }
 
     #endregion

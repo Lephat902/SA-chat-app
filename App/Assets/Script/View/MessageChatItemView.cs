@@ -37,6 +37,7 @@ class MessageChatItemView : MonoBehaviour
             otherFakeTxt.gameObject.SetActive(true);
         }
 
+        otherFakeContentSize.SetLayoutVertical();
         myFakeContentSize.SetLayoutVertical();
         await UniTask.DelayFrame(20);
         

@@ -30,27 +30,27 @@ public class ChatFriendItemView : FriendItemView
                 {
                     name = friendDataModel.username,
                     description = "chim",
-                    avatar = friendDataModel.avatar,
+                    avatar = "chim",
                     initialMembers = new() { friendDataModel.id }
                 },
-                () => Chat());
+                () => ChatController.OnConversationOpen.Invoke(existConversationId));
         else
             ChatController.OnConversationOpen.Invoke(existConversationId);
     }
 
     private string CheckExistConversation(string otherId)
     {
-        for (int i = 0; i < chatDataAsset.ConversationList.Count; i++)
+        foreach(var conversationData in chatDataAsset.ConversationList)
         {
-            var conversationData = chatDataAsset.ConversationList[i];
+            var data = conversationData.Key;
             int check = 0;
-            if (conversationData.users.Count == 2)
-                for (int j = 0; j < conversationData.users.Count; j++)
-                    if (conversationData.users[j].id == userDataAsset.UserDataModel.id || conversationData.users[j].id == otherId)
+            if (data.users.Count == 2)
+                for (int j = 0; j < data.users.Count; j++)
+                    if (data.users[j].id == userDataAsset.UserDataModel.id || data.users[j].id == otherId)
                         check++;
             
             if (check == 2)
-                return conversationData.id;
+                return data.id;
         }
 
         return string.Empty;

@@ -8,46 +8,55 @@ using UnityEngine;
 class ChatDataAsset : ScriptableObject
 {
     [SerializeField] private UserDataAsset userDataAsset;
-    [SerializeField] private List<ConversationDataModel> conversationList;
+    [SerializeField] private Dictionary<HeaderConversationDataModel, List<MessageConversationDataModel>> conversationList;
 
-    public List<ConversationDataModel> ConversationList
-    {
-        get { return conversationList; }
-        //set { conversationList = value; }
-    }
+    public Dictionary<HeaderConversationDataModel, List<MessageConversationDataModel>> ConversationList => conversationList;
 
-    public bool AddConversation(ConversationDataModel conversationDataModel)
+    public bool AddConversation(HeaderConversationDataModel conversationDataModel)
     {
         if (conversationList == null)
             conversationList = new();
 
-        for (int i = 0; i < conversationList.Count; i++)
-            if (conversationList[i].id == conversationDataModel.id)
+        foreach (var conversationData in conversationList)
+            if (conversationData.Key.id == conversationDataModel.id)
+            {
+                var messageData = conversationList[conversationData.Key];
+                conversationList.Remove(conversationData.Key);
+                conversationList.Add(conversationDataModel, messageData);
                 return false;
+            }
 
-        conversationList.Add(conversationDataModel);
+
+        conversationList.Add(conversationDataModel, new List<MessageConversationDataModel>());
         return true;
     }
 
-    public bool AddMessage(string conversationId, ChatDataModel chatDataModel)
+    public bool AddMessage(string conversationId, MessageConversationDataModel chatDataModel)
     {
         if (conversationList == null)
             conversationList = new();
 
-        for (int i = 0; i < conversationList.Count; i++)
-            if (conversationList[i].id == conversationId)
+        foreach (var conversationData in conversationList)
+            if (conversationData.Key.id == conversationId)
             {
-                conversationList[i].userConversations.Add(chatDataModel);
+                if (conversationData.Value.Count == 0)
+                    CustomHTTP.GetMessageConversation(userDataAsset.AccessToken, conversationId,
+                                                    (res) => { conversationList[conversationData.Key] = res; },
+                                                    () => { Debug.LogError("Can't Load Conversation Message");});
+                else
+                    conversationData.Value.Add(chatDataModel);
                 return true;
             }
 
-        conversationList.Add(new ConversationDataModel()
+        conversationList.Add(new HeaderConversationDataModel()
         {
             id = conversationId,
-            users = new(),
-            messages = new(),
-            userConversations = new() { chatDataModel }
-        });
+            createdAt = "chim",
+            name = "chim",
+            description = "chim",
+            avatar = "chim",
+            users = new List<ConversationUserDataModel>()
+        }, new List<MessageConversationDataModel>() { chatDataModel }); ;
         return true;
     }
 
@@ -67,22 +76,22 @@ class ChatDataAsset : ScriptableObject
         CustomHTTP.GetConversation(userDataAsset.AccessToken,
             async (res1) =>
             {
-                var list = new List<ConversationDataModel>();
+                var list = new Dictionary<HeaderConversationDataModel, List<MessageConversationDataModel>>();
                 int wait = 0;
                 if (res1 != null)
                 {
                     wait = res1.Count;
                     for (int i = 0; i < res1.Count; i++)
                     {
-                        CustomHTTP.GetConversation(userDataAsset.AccessToken,
+                        CustomHTTP.GetHeaderConversation(userDataAsset.AccessToken,
                                                     res1[i].id,
-                                                    (res2) => { list.Add(res2); wait--; },
-                                                    () => { Debug.LogError("Can't Load Conversation"); wait--; });
+                                                    (res2) => { list.Add(res2, new List<MessageConversationDataModel>()); wait--; },
+                                                    () => { Debug.LogError("Can't Load Conversation Header"); wait--; });
                     }
                 }
 
                 await UniTask.WaitUntil(() => wait == 0);
-                
+
                 conversationList = list;
                 Debug.Log("Done load chat data");
             },

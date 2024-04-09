@@ -14,9 +14,9 @@ class MessageAvatarItemView : MonoBehaviour
     [SerializeField] private GameObject imageActive;
     [SerializeField] private Button button;
     [SerializeField] private Sprite defaultSpite;
-    private ConversationDataModel conversationDataModel;
+    private HeaderConversationDataModel conversationDataModel;
 
-    public void SetUp(ConversationDataModel conversationDataModel)
+    public void SetUp(HeaderConversationDataModel conversationDataModel)
     {
 
         StartCoroutine(LoadImage(conversationDataModel.avatar));

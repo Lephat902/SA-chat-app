@@ -36,7 +36,7 @@ partial class CustomSocket : MonoBehaviour
 
     private void HandleConversationCreated(ChatCreate chatCreate)
     {
-        CustomHTTP.GetConversation(userDataAsset.AccessToken,
+        CustomHTTP.GetHeaderConversation(userDataAsset.AccessToken,
                                     chatCreate.conversationId,
                                     (res) => { ChatController.OnConversationCreate.Invoke(res); },
                                     () => { Debug.LogError("Can't Load Conversation"); });
@@ -46,12 +46,12 @@ partial class CustomSocket : MonoBehaviour
     {
         ChatController.OnChatMessageRecieve.Invoke(
             chatReceive.conversationId,
-            new ChatDataModel()
+            new MessageConversationDataModel()
             {
                 id = chatReceive.id,
-                user = chatReceive.userId,
-                conversation = chatReceive.text,
-                lastReadMessage = "Chim"
+                userId = chatReceive.userId,
+                text = chatReceive.text,
+                createdAt = chatReceive.createdAt
             });
     }
 

@@ -31,8 +31,8 @@ public class ChatController : MonoBehaviour
 
     public static string CurConversationId => curConversationId;
 
-    public static UnityEvent<ConversationDataModel> OnConversationCreate = new();
-    public static UnityEvent<string, ChatDataModel> OnChatMessageRecieve = new();
+    public static UnityEvent<HeaderConversationDataModel> OnConversationCreate = new();
+    public static UnityEvent<string, MessageConversationDataModel> OnChatMessageRecieve = new();
     public static UnityEvent<string> OnConversationOpen = new();
 
     void Start()
@@ -67,9 +67,10 @@ public class ChatController : MonoBehaviour
         if (chatDataAsset.ConversationList == null)
             return;
 
-        for (int i = 0; i < chatDataAsset.ConversationList.Count; i++)
+        var i = 0;
+        foreach(var conversationData in chatDataAsset.ConversationList)
         {
-            var conversationDataModel = chatDataAsset.ConversationList[i];
+            var conversationDataModel = conversationData.Key;
 
             if (i < listAvatar.Count)
             {
@@ -83,11 +84,13 @@ public class ChatController : MonoBehaviour
                 newItem.SetUp(conversationDataModel);
                 listAvatar.Add(newItem);
             }
+
+            i++;
         }
 
         if (listAvatar.Count > chatDataAsset.ConversationList.Count)
-            for (int i = chatDataAsset.ConversationList.Count; i < listAvatar.Count; i++)
-                listAvatar[i].gameObject.SetActive(false);
+            for (int j = chatDataAsset.ConversationList.Count; j < listAvatar.Count; j++)
+                listAvatar[j].gameObject.SetActive(false);
     }
 
     private void SetUIChat(string conversationId)
@@ -95,10 +98,10 @@ public class ChatController : MonoBehaviour
         if (chatDataAsset.ConversationList == null)
             return;
 
-        List<ChatDataModel> chatDataModels = null; 
-        for (int i = 0; i < chatDataAsset.ConversationList.Count; i++)
-            if (chatDataAsset.ConversationList[i].id == conversationId)
-                chatDataModels = chatDataAsset.ConversationList[i].userConversations;
+        List<MessageConversationDataModel> chatDataModels = null;
+        foreach (var conversationData in chatDataAsset.ConversationList)
+            if (conversationData.Key.id == conversationId)
+                chatDataModels = conversationData.Value;
 
         if (chatDataModels == null)
             chatDataModels = new();
@@ -130,7 +133,7 @@ public class ChatController : MonoBehaviour
                 listAvatar[i].gameObject.SetActive(false);
     }
 
-    private void AddUIChat(string conversationId, ChatDataModel chatDataModel)
+    private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
     {
         if (conversationId != curConversationId)
             return;
@@ -138,10 +141,10 @@ public class ChatController : MonoBehaviour
         if (chatDataAsset.ConversationList == null)
             return;
 
-        List<ChatDataModel> chatDataModels = null;
-        for (int i = 0; i < chatDataAsset.ConversationList.Count; i++)
-            if (chatDataAsset.ConversationList[i].id == conversationId)
-                chatDataModels = chatDataAsset.ConversationList[i].userConversations;
+        List<MessageConversationDataModel> chatDataModels = null;
+        foreach (var conversationData in chatDataAsset.ConversationList)
+            if (conversationData.Key.id == conversationId)
+                chatDataModels = conversationData.Value;
 
         if (chatDataModels == null)
             return;
@@ -205,13 +208,13 @@ public class ChatController : MonoBehaviour
             sendMessageObj.SetActive(true);
     }
 
-    private void ConversationCreate(ConversationDataModel conversationDataModel)
+    private void ConversationCreate(HeaderConversationDataModel conversationDataModel)
     {
         chatDataAsset.AddConversation(conversationDataModel);
         SetUIAvatar();
     }
 
-    private void ChatMessageReceive(string conversationId, ChatDataModel chatDataModel)
+    private void ChatMessageReceive(string conversationId, MessageConversationDataModel chatDataModel)
     {
         chatDataAsset.AddMessage(conversationId, chatDataModel);
         AddUIChat(conversationId, chatDataModel);

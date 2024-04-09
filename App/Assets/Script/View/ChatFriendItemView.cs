@@ -30,7 +30,7 @@ public class ChatFriendItemView : FriendItemView
                 {
                     name = friendDataModel.username,
                     description = "chim",
-                    avatar = "chim",
+                    avatar = "chim.com",
                     initialMembers = new() { friendDataModel.id }
                 },
                 () => ChatController.OnConversationOpen.Invoke(existConversationId));

@@ -1410,6 +1410,7 @@ MonoBehaviour:
   chatDataAsset: {fileID: 11400000, guid: 725ae65ca09b5d74bb8621fb497a222e, type: 2}
   chatOpenBtn: {fileID: 4635434827405326354}
   chatCanvasGroup: {fileID: 3833358226126582575}
+  scrollRect: {fileID: 2942220670045559305}
   chatAvatarContentObj: {fileID: 3224864698014525826}
   chatConversationContentObj: {fileID: 4271430890410279634}
   messageAvatarItemObj: {fileID: 582520858519453495, guid: f30542f3a61d38749b6186a3cb7e9e55, type: 3}

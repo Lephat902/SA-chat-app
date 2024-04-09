@@ -16,6 +16,7 @@ public class ChatController : MonoBehaviour
     [Header("Chat")]
     [SerializeField] private Button chatOpenBtn;
     [SerializeField] private CanvasGroup chatCanvasGroup;
+    [SerializeField] private ScrollRect scrollRect;
     [SerializeField] private Transform chatAvatarContentObj;
     [SerializeField] private Transform chatConversationContentObj;
     [SerializeField] private MessageAvatarItemView messageAvatarItemObj;
@@ -136,6 +137,7 @@ public class ChatController : MonoBehaviour
 
         await UniTask.DelayFrame(5);
         chatConversationContentObj.gameObject.SetActive(true);
+        ScrollUIToBottom();
     }
 
     private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
@@ -167,6 +169,14 @@ public class ChatController : MonoBehaviour
             listChat.Add(newItem);
             curConversationIndex = listChat.Count - 1;
         }
+
+        ScrollUIToBottom();
+    }
+
+    private void ScrollUIToBottom()
+    {
+        if (scrollRect.verticalNormalizedPosition <= 0.3)
+            scrollRect.verticalNormalizedPosition = 0;
     }
 
     #endregion

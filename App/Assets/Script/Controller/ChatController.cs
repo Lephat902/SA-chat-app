@@ -93,7 +93,7 @@ public class ChatController : MonoBehaviour
                 listAvatar[j].gameObject.SetActive(false);
     }
 
-    private void SetUIChat(string conversationId)
+    private async void SetUIChat(string conversationId)
     {
         if (chatDataAsset.ConversationList == null)
             return;
@@ -105,6 +105,8 @@ public class ChatController : MonoBehaviour
 
         if (chatDataModels == null)
             chatDataModels = new();
+
+        chatConversationContentObj.gameObject.SetActive(false);
 
         curConversationId = conversationId;
 
@@ -131,6 +133,9 @@ public class ChatController : MonoBehaviour
         if (listChat.Count > chatDataModels.Count)
             for (int i = chatDataModels.Count; i < listChat.Count; i++)
                 listChat[i].gameObject.SetActive(false);
+
+        await UniTask.DelayFrame(5);
+        chatConversationContentObj.gameObject.SetActive(true);
     }
 
     private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)

@@ -175,8 +175,9 @@ public class ChatController : MonoBehaviour
 
     private void ScrollUIToBottom()
     {
+        Debug.LogError(scrollRect.verticalNormalizedPosition);
         if (scrollRect.verticalNormalizedPosition <= 0.3)
-            scrollRect.verticalNormalizedPosition = 0;
+            scrollRect.normalizedPosition = new Vector2(0, -1f);
     }
 
     #endregion

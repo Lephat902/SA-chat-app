@@ -92,7 +92,7 @@ public static partial class CustomHTTP
     public static async void GetMessageConversation(string accessToken, string conversationId, Action<List<MessageConversationDataModel>> result, Action error)
     {
         var url = DOMAIN + $"/conversations/";
-        var response = await GET(url + conversationId + "/messages?limit=10&dir=DESC", accessToken);
+        var response = await GET(url + conversationId + "/messages?limit=20&dir=DESC", accessToken);
 
         var content = await response.Content.ReadAsStringAsync();
 

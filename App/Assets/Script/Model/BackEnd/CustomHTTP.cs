@@ -1,7 +1,10 @@
-﻿using System.Net.Http;
+﻿using Cysharp.Threading.Tasks;
+using System;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public static partial class CustomHTTP
 {
@@ -57,4 +60,27 @@ public static partial class CustomHTTP
             return respone;
         }
     }
+
+    #region WEBGL
+    private static async Task<Tuple<bool, string>> POST(string url, object data, bool gl)
+    {
+        var jsonData = JsonUtility.ToJson(data);
+        Debug.Log("POST to " + url + " data: " + jsonData);
+        
+        var request = new UnityWebRequest(url + "/", "POST");
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        Debug.Log(request.GetRequestHeader("AUTHORIZATION"));
+
+        await request.SendWebRequest();
+        await UniTask.WaitUntil(() => request.isDone);
+        if (request.isHttpError)
+            return (new Tuple<bool, string>(false, request.error));
+        else
+            return (new Tuple<bool, string>(true, request.downloadHandler.text));
+    }
+    #endregion
 }

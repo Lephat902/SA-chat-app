@@ -12,4 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ff5291d1490bbd4c8701f70d8a508fc, type: 3}
   m_Name: UserDataAsset
   m_EditorClassIdentifier: 
-  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjUxN2ZjM2I2LTI3MmEtNDkyOS1hYWQ5LTQ3YWQyNmMzNzk1NiIsImlhdCI6MTcxMDc4NTY3OSwiZXhwIjoxNzEzMzc3Njc5fQ.9CcfaEPDmXfBDnb4VohMpJoK_KpiFA_v3elmFAmnPT4
+  accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgxZWQ1YmRmLThmMDMtNGJlNC1iNWRhLTFiZTY3NGU2OWY1ZiIsImlhdCI6MTcxMjc2ODYyOCwiZXhwIjoxNzE1MzYwNjI4fQ.N7kr_c1Tv8YuOlWoRZvIJ7ROmlhdKyukVVTgRqPAabY
+  userDataModel:
+    accessToken: 
+    id: 81ed5bdf-8f03-4be4-b5da-1be674e69f5f
+    username: tuan5
+    password: 
+    avatar: https://fastly.picsum.photos/id/468/200/200.jpg?hmac=ebOvOZemklGsjJmYIRJ4_YWUDCNNpt5bE0B7EjYJfEA
+    isOnline: 0

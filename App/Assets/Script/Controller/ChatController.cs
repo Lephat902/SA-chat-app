@@ -179,7 +179,6 @@ public class ChatController : MonoBehaviour
     private async void ScrollUIToBottom()
     {
         await UniTask.DelayFrame(20);
-        Debug.LogError(scrollRect.verticalNormalizedPosition);
         if (scrollRect.verticalNormalizedPosition <= 0.3)
             scrollRect.normalizedPosition = new Vector2(0, 0);
     }

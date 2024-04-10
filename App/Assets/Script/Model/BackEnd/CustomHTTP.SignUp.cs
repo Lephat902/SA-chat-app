@@ -43,10 +43,13 @@ public static partial class CustomHTTP
         else
             result.Invoke(JsonUtility.FromJson<LoginSuccessRequest>(content));*/
 
-        var response = await POST(url, data, true);
-        if (!response.Item1)
-            error.Invoke(JsonUtility.FromJson<LoginFailRequest>(response.Item2));
+        var response = await POST(url, data);
+
+        Debug.Log("Result: " + response.message);
+
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<LoginFailRequest>(response.message));
         else
-            result.Invoke(JsonUtility.FromJson<LoginSuccessRequest>(response.Item2));
+            result.Invoke(JsonUtility.FromJson<LoginSuccessRequest>(response.message));
     }
 }

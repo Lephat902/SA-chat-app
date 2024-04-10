@@ -28,14 +28,12 @@ public static partial class CustomHTTP
         var url = CustomHTTP.DOMAIN + $"/users/username/{userName}/profile";
         var response = await GET(url);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<UserFailRequest>(content));
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<UserFailRequest>(response.message));
         else
-            result.Invoke(JsonUtility.FromJson<UserDataModel>(content));
+            result.Invoke(JsonUtility.FromJson<UserDataModel>(response.message));
     }
 
     public static async void GetProfileByID(string userId, Action<UserDataModel> result, Action<UserFailRequest> error)
@@ -43,13 +41,11 @@ public static partial class CustomHTTP
         var url = CustomHTTP.DOMAIN + $"/users/id/{userId}/profile";
         var response = await GET(url);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<UserFailRequest>(content));
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<UserFailRequest>(response.message));
         else
-            result.Invoke(JsonUtility.FromJson<UserDataModel>(content));
+            result.Invoke(JsonUtility.FromJson<UserDataModel>(response.message));
     }
 }

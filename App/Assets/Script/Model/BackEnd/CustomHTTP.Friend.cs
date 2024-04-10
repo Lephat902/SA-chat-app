@@ -53,14 +53,12 @@ public static partial class CustomHTTP
         var url = DOMAIN + $"/users/friends";
         var response = await GET(url, accessToken);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(response.message));
         else
-            result.Invoke(JsonUtility.FromJson<ListFriendDataModel>("{ \"list\": " + content + "}").list);
+            result.Invoke(JsonUtility.FromJson<ListFriendDataModel>("{ \"list\": " + response.message + "}").list);
     }
 
     public static async void SearchFriend(string searchString, Action<List<FriendDataModel>> result, Action<FriendFailRequest> error)
@@ -69,15 +67,13 @@ public static partial class CustomHTTP
 
         var response = await GET(url + $"?page=1&limit=10&q={searchString}");
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(response.message));
         else
         {
-            var data = JsonUtility.FromJson<SearchFriendDataModel>(content);
+            var data = JsonUtility.FromJson<SearchFriendDataModel>(response.message);
             if (data.totalCount == 0)
                 result.Invoke(new List<FriendDataModel>());
             else
@@ -90,14 +86,12 @@ public static partial class CustomHTTP
         var url = DOMAIN + $"/users/received-requests";
         var response = await GET(url, accessToken);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
-            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(content));
+        if (!response.isSuccess)
+            error.Invoke(JsonUtility.FromJson<FriendFailRequest>(response.message));
         else
-            result.Invoke(JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + content + "}").list);
+            result.Invoke(JsonUtility.FromJson<ListRequestDataModel>("{ \"list\": " + response.message + "}").list);
     }
 
     public static async void SendRequestFriend(string accessToken, string id, Action<bool> result)
@@ -105,11 +99,9 @@ public static partial class CustomHTTP
         var url = DOMAIN + $"/users/friend-requests/{id}";
         var response = await POST(url, null, accessToken);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
+        if (!response.isSuccess)
             result.Invoke(false);
         else
             result.Invoke(true);
@@ -120,11 +112,9 @@ public static partial class CustomHTTP
         var url = DOMAIN + $"/users/received-requests/{id}/accept";
         var response = await PUT(url, accessToken);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
+        if (!response.isSuccess)
             result.Invoke(false);
         else
             result.Invoke(true);
@@ -135,11 +125,9 @@ public static partial class CustomHTTP
         var url = DOMAIN + $"/users/received-requests/{id}/reject";
         var response = await PUT(url, accessToken);
 
-        var content = await response.Content.ReadAsStringAsync();
+        Debug.Log("Result: " + response.message);
 
-        Debug.Log("Result: " + content);
-
-        if (!response.IsSuccessStatusCode)
+        if (!response.isSuccess)
             result.Invoke(false);
         else
             result.Invoke(true);

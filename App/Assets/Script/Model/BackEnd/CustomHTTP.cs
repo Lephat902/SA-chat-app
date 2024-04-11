@@ -79,11 +79,9 @@ public static partial class CustomHTTP
 
     private static void AddDefaultHeader(UnityWebRequest request)
     {
-        request.SetRequestHeader("Access-Control-Allow-Credentials", "true");
-        request.SetRequestHeader("Access-Control-Expose-Headers", "Content-Length, Content-Encoding");
-        request.SetRequestHeader("Access-Control-Allow-Headers", "Accept, X-Access-Token, X-Application-Name, X-Request-Sent-Time, Content-Type");
-        request.SetRequestHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-        request.SetRequestHeader("Access-Control-Allow-Origin", "*");
+        //request.SetRequestHeader("Access-Control-Allow-Origin", "https://html-classic.itch.zone");
+        request.SetRequestHeader("accept", "*");
+        request.SetRequestHeader("Content-Type", "application/json");
     }
 
     private static async Task<HTTPDataRespone> POST(string url, object data)
@@ -96,8 +94,7 @@ public static partial class CustomHTTP
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-        
+
         try
         {
             await request.SendWebRequest();
@@ -112,16 +109,16 @@ public static partial class CustomHTTP
 
     private static async Task<HTTPDataRespone> POST(string url, object data, string accessToken)
     {
+        string at = accessToken != null ? accessToken : "null";
         var jsonData = JsonUtility.ToJson(data);
-        Debug.Log("POST to " + url + " data: " + jsonData);
+        Debug.Log("POST to " + url + " data: " + jsonData + " with accessToken: " + at);
 
         var request = new UnityWebRequest(url, "POST");
         AddDefaultHeader(request);
         byte[] bodyRaw = Encoding.UTF8.GetBytes(jsonData);
         request.uploadHandler = new UploadHandlerRaw(bodyRaw);
         request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
-        request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+        request.SetRequestHeader("authorization", "Bearer " + accessToken);
 
         try
         {
@@ -137,14 +134,14 @@ public static partial class CustomHTTP
 
     private static async Task<HTTPDataRespone> GET(string url, string accessToken = null)
     {
-        Debug.Log("Get from " + url);
+        string at = accessToken != null ? accessToken : "null";
+        Debug.Log("Get from " + url + " with accessToken: " + at);
 
         var request = new UnityWebRequest(url, "GET");
         AddDefaultHeader(request);
         request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
         if (accessToken != null)
-            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+            request.SetRequestHeader("authorization", "Bearer " + accessToken);
 
         try
         {
@@ -160,14 +157,14 @@ public static partial class CustomHTTP
 
     private static async Task<HTTPDataRespone> PUT(string url, string accessToken = null)
     {
-        Debug.Log("PUT to " + url);
+        string at = accessToken != null ? accessToken : "null";
+        Debug.Log("PUT to " + url + " with accessToken: " + at);
 
         var request = new UnityWebRequest(url, "PUT");
         AddDefaultHeader(request);
         request.downloadHandler = new DownloadHandlerBuffer();
-        request.SetRequestHeader("Content-Type", "application/json");
         if (accessToken != null)
-            request.SetRequestHeader("Authorization", "Bearer " + accessToken);
+            request.SetRequestHeader("authorization", "Bearer " + accessToken);
 
         try
         {

@@ -29,11 +29,11 @@ partial class CustomSocket : MonoBehaviour
 {
     private void StartFriend()
     {
-        socket.OnUnityThread("friend-request-sent",
+        /*socket.OnUnityThread("friend-request-sent",
             res =>HandleFriendMessageRequest(CustomJson<FriendMessageRequest>.ParseList(res.ToString())[0]));
 
         socket.OnUnityThread("friend-request-updated",
-            res => HandleFriendMessageUpdate(CustomJson<FriendMessageUpdate>.ParseList(res.ToString())[0]));
+            res => HandleFriendMessageUpdate(CustomJson<FriendMessageUpdate>.ParseList(res.ToString())[0]));*/
     }
 
     private void HandleFriendMessageRequest(FriendMessageRequest friendMessageRequest)

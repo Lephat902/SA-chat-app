@@ -128,14 +128,17 @@ public class SignUpController : MonoBehaviour
             {
                 userDataAsset.UserDataModel = res;
 
-                customSocket.StartConnect();
-
-                statusText.text = "Loading to Home!";
+                statusText.text = "Loading Data!";
 
                 await friendDataAsset.StartLoad();
                 await chatDataAsset.StartLoad();
 
                 Debug.Log("Done load all data");
+
+                statusText.text = "Connecting to socket!";
+
+                await customSocket.StartConnect();
+
                 SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },
             (err) =>

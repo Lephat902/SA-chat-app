@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SocketIOClient;
-using SocketIOClient.Newtonsoft.Json;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.UI;
 
 [Serializable]
 public struct ChatCreate
@@ -27,11 +23,11 @@ partial class CustomSocket : MonoBehaviour
 {
     private void StartChat()
     {
-        socket.OnUnityThread("conversation-created",
+        /*socket.OnUnityThread("conversation-created",
             res => HandleConversationCreated(CustomJson<ChatCreate>.ParseList(res.ToString())[0]));
 
         socket.OnUnityThread("receive-message",
-            res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));
+            res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));*/
     }
 
     private void HandleConversationCreated(ChatCreate chatCreate)
@@ -58,6 +54,7 @@ partial class CustomSocket : MonoBehaviour
     public static void SendChatMessage(string conversationId, string text)
     {
         var message = "{\"text\": \"" + text + "\", \"conversationId\": \"" + conversationId + "\"}";
-        socket.EmitStringAsJSON("send-message", message);
+        //socket.EmitStringAsJSON("send-message", message);
+        socket.SendText("{\"send-message: \""+ message + "}");
     }
 }

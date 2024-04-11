@@ -18,7 +18,7 @@ async function bootstrap() {
 
   // Enable CORS with specific domain patterns
   app.enableCors({
-    allowedHeaders: ['content-type'],
+    allowedHeaders: ['content-type', 'authorization'],
     credentials: true,
     methods: 'GET,PUT,POST,PATCH,DELETE,UPDATE,OPTIONS',
     origin: (origin, callback) => {

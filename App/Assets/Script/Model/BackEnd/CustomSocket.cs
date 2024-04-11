@@ -8,7 +8,7 @@ partial class CustomSocket : MonoBehaviour
 {
     [SerializeField] private UserDataAsset userDataAsset;
 
-    private const string DOMAIN = "https://chatapp.tutorify.site";
+    private const string DOMAIN = "ws://chatapp.tutorify.site";
     private static WebSocket socket;
     private bool isConnecting;
 
@@ -17,9 +17,9 @@ partial class CustomSocket : MonoBehaviour
     {
         isConnecting = false;
 
-        Debug.Log("Start connect to socket");
-        var uri = new Uri(DOMAIN);
-        /*socket = new SocketIOUnity(uri, new SocketIOOptions
+        Debug.Log("Start connect to socket: " + DOMAIN);
+        /*var uri = new Uri(DOMAIN);
+        socket = new SocketIOUnity(uri, new SocketIOOptions
         {
             Query = new Dictionary<string, string> { { "token", userDataAsset.AccessToken } },
             Transport = SocketIOClient.Transport.TransportProtocol.WebSocket
@@ -34,6 +34,12 @@ partial class CustomSocket : MonoBehaviour
         socket.OnOpen += () => { Debug.Log("Done connect to socket"); isConnecting = true; };
         socket.OnClose += (e) => { Debug.LogError("Disconnect to socket: " + e); isConnecting = false; };
         socket.OnError += (e) => { Debug.LogError("Error of socket: " + e); isConnecting = false; };
+        socket.OnMessage += (bytes) =>
+        {
+            var message = System.Text.Encoding.UTF8.GetString(bytes);
+            Debug.Log("Received OnMessage! (" + bytes.Length + " bytes) " + message);
+            HandleMessage(message);
+        };
 
         await socket.Connect();
 
@@ -41,5 +47,18 @@ partial class CustomSocket : MonoBehaviour
         StartChat();
 
         await UniTask.WaitUntil(() => isConnecting);
+    }
+
+    private void Update()
+    {
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (socket != null)
+            socket.DispatchMessageQueue();
+#endif 
+    }
+
+    private void HandleMessage(string message)
+    {
+
     }
 }

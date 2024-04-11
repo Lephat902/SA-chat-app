@@ -41,7 +41,7 @@ import { ConversationService } from 'src/conversation/services';
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   cors: {
-    origin: ["null", null],
+    origin: ["null", null, "https://html-classic.itch.zone"],
     methods: ["GET", "POST"],
     transports: ['websocket', 'polling'],
     credentials: true

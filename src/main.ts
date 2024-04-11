@@ -3,10 +3,10 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { AuthIoAdapter } from './chat/adapters/auth.adapter';
 import { ConfigService } from '@nestjs/config';
 import { GlobalExceptionsFilter } from './global-exceptions-filter';
 import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -57,7 +57,7 @@ async function bootstrap() {
     }),
   );
 
-  app.useWebSocketAdapter(new AuthIoAdapter(app));
+  app.useWebSocketAdapter(new IoAdapter(app));
 
   // Set up Swagger documentation
   setUpSwagger(app);

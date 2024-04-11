@@ -29,9 +29,12 @@ async function bootstrap() {
       // Define the regular expression pattern for localhost
       const localhostPattern = /^https?:\/\/localhost(?::\d+)?$/; // Match http://localhost[:port_number]
 
+      // Get the allowed domains from the environment variable
+      const allowedDomains = process.env.ALLOWED_DOMAINS.split(',');
+
       if (
         localhostPattern.test(origin)
-        || origin === configService.get<string>('APP_DOMAIN')
+        || allowedDomains.includes(origin)
       ) {
         callback(null, true);
       } else {

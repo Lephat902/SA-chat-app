@@ -5,6 +5,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
   SubscribeMessage,
+  MessageBody,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { UserService } from 'src/user/services';
@@ -86,6 +87,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(userId);
     if (newNumberOfSocketConnections === 0)
       await this.userService.updateOnlineStatus(userId, false);
+  }
+
+  @AsyncApiPub({
+    channel: 'ping',
+    message: {
+      payload: String
+    },
+    description: 'Used to check socket connection. Receive the same thing you sent to the server'
+  })
+  @SubscribeMessage('ping')
+  async ping(@MessageBody() data: unknown) {
+    return data;
   }
 
   @AsyncApiPub({

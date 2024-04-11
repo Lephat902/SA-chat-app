@@ -28,6 +28,7 @@ partial class CustomSocket : MonoBehaviour
         });
         socket.OnConnected += (sender, e) => { Debug.Log("Done connect to socket"); isConnecting = true; };
         socket.OnDisconnected += (sender, e) => { Debug.LogError("Disconnect to socket"); isConnecting = false; };
+        socket.OnError += (sender, e) => { Debug.LogError("Error socket");};
 
         socket.Connect();
 

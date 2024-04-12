@@ -8,7 +8,7 @@ partial class CustomSocket : MonoBehaviour
 {
     [SerializeField] private UserDataAsset userDataAsset;
 
-    private const string DOMAIN = "ws://chatapp.tutorify.site";
+    private const string DOMAIN = "wss://chatapp.tutorify.site";
     private static WebSocket socket;
     private bool isConnecting;
 
@@ -41,7 +41,7 @@ partial class CustomSocket : MonoBehaviour
             HandleMessage(message);
         };
 
-        await socket.Connect();
+        socket.Connect();
 
         StartFriend();
         StartChat();

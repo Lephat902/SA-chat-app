@@ -2,9 +2,9 @@ import { Controller, ForbiddenException, Get, Param, Query, Req, UseGuards } fro
 import { RequestWithUser } from '../../common';
 import { ConversationService } from '../services/conversation.service';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
-import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiParam, ApiExtraModels, refs } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiTags, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { Conversation } from '../entities';
-import { DirectConversationItemQueryResponse, GroupConversationItemQueryResponse, QueryConversationDto } from '../dtos';
+import { QueryConversationDto } from '../dtos';
 
 @Controller('conversations')
 @ApiTags('Conversation')
@@ -15,14 +15,12 @@ export class ConversationController {
   @UseGuards(JwtAuthGuard)
   @Get()
   @ApiOperation({ summary: 'Get all user conversations', description: 'Retrieves all conversations belonging to the authenticated user.' })
-  @ApiExtraModels(DirectConversationItemQueryResponse, GroupConversationItemQueryResponse)
   @ApiResponse({
     status: 200,
     description: 'Conversations retrieved successfully',
-    schema: { oneOf: refs(DirectConversationItemQueryResponse, GroupConversationItemQueryResponse) },
+    type: [Conversation],
   })
-  async findMyConversations(@Req() req: RequestWithUser, @Query() queryConversationDto: QueryConversationDto): Promise<
-    (DirectConversationItemQueryResponse | GroupConversationItemQueryResponse)[]> {
+  async findMyConversations(@Req() req: RequestWithUser, @Query() queryConversationDto: QueryConversationDto): Promise<Conversation[]> {
     queryConversationDto.userId = req.user.id;
     return this.conversationService.findAllConversationsWithRelationsByUserId(queryConversationDto);
   }

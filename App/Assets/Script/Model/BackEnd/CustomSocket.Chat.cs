@@ -60,18 +60,15 @@ partial class CustomSocket : MonoBehaviour
         socket.OnUnityThread("receive-message",
             res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));*/
 
-        if (socket == null)
-            return;
-
         socket.OnMessage += (bytes) =>
         {
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             Debug.Log("Received OnMessage! (" + bytes.Length + " bytes) " + message);
-            HandleMessage(message);
+            HandleMessageChat(message);
         };
     }
 
-    private void HandleMessage(string message)
+    private void HandleMessageChat(string message)
     {
         var socketChatCreateEventData = JsonUtility.FromJson<SocketChatCreateEvent>(message);
         if (socketChatCreateEventData.@event == "conversation-created")

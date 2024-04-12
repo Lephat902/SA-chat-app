@@ -1,16 +1,45 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public struct ChatCreate
+public struct SocketChatSendEvent
+{
+    public string @event;
+    public SocketChatSendEventData data;
+}
+
+[Serializable]
+public struct SocketChatSendEventData
+{
+    public string conversationId;
+    public string text;
+}
+
+[Serializable]
+public struct SocketChatCreateEvent
+{
+    public string @event;
+    public SocketChatCreateEventData data;
+}
+
+[Serializable]
+public struct SocketChatCreateEventData
 {
     public string conversationId;
     public List<string> membersIdsList;
 }
 
 [Serializable]
-public struct ChatReceive
+public struct SocketChatReceiveEvent
+{
+    public string @event;
+    public SocketChatReceiveEventData data;
+}
+
+[Serializable]
+public struct SocketChatReceiveEventData
 {
     public string id;
     public string userId;
@@ -18,6 +47,8 @@ public struct ChatReceive
     public string text;
     public string createdAt;
 }
+
+
 
 partial class CustomSocket : MonoBehaviour
 {
@@ -28,9 +59,30 @@ partial class CustomSocket : MonoBehaviour
 
         socket.OnUnityThread("receive-message",
             res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));*/
+
+        if (socket == null)
+            return;
+
+        socket.OnMessage += (bytes) =>
+        {
+            var message = System.Text.Encoding.UTF8.GetString(bytes);
+            Debug.Log("Received OnMessage! (" + bytes.Length + " bytes) " + message);
+            HandleMessage(message);
+        };
     }
 
-    private void HandleConversationCreated(ChatCreate chatCreate)
+    private void HandleMessage(string message)
+    {
+        var socketChatCreateEventData = JsonUtility.FromJson<SocketChatCreateEvent>(message);
+        if (socketChatCreateEventData.@event == "conversation-created")
+            HandleConversationCreated(socketChatCreateEventData.data);
+
+        var socketChatReceiveEventData = JsonUtility.FromJson<SocketChatReceiveEvent>(message);
+        if (socketChatReceiveEventData.@event == "receive-message")
+            HandleReceiveMessage(socketChatReceiveEventData.data);
+    }
+
+    private void HandleConversationCreated(SocketChatCreateEventData chatCreate)
     {
         CustomHTTP.GetHeaderConversation(userDataAsset.AccessToken,
                                     chatCreate.conversationId,
@@ -38,7 +90,7 @@ partial class CustomSocket : MonoBehaviour
                                     () => { Debug.LogError("Can't Load Conversation"); });
     }
 
-    private void HandleReceiveMessage(ChatReceive chatReceive)
+    private void HandleReceiveMessage(SocketChatReceiveEventData chatReceive)
     {
         ChatController.OnChatMessageRecieve.Invoke(
             chatReceive.conversationId,
@@ -53,8 +105,15 @@ partial class CustomSocket : MonoBehaviour
 
     public static void SendChatMessage(string conversationId, string text)
     {
-        var message = "{\"text\": \"" + text + "\", \"conversationId\": \"" + conversationId + "\"}";
+        var message = JsonUtility.ToJson(new SocketChatSendEvent()
+        {
+            @event = "send-message",
+            data = new SocketChatSendEventData() { conversationId = conversationId, text = text }
+        });
+
+        Debug.Log("Send message: " + message);
         //socket.EmitStringAsJSON("send-message", message);
-        socket.SendText("{\"send-message: \""+ message + "}");
+
+        socket.SendText(message); 
     }
 }

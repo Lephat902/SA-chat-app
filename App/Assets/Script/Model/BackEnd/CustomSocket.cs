@@ -30,16 +30,10 @@ partial class CustomSocket : MonoBehaviour
 
         socket.Connect();*/
 
-        socket = new WebSocket(DOMAIN, new Dictionary<string, string> { { "token", userDataAsset.AccessToken } });
+        socket = new WebSocket(DOMAIN + string.Format("?token={0}", userDataAsset.AccessToken));//, new Dictionary<string, string> { { "token", userDataAsset.AccessToken } });
         socket.OnOpen += () => { Debug.Log("Done connect to socket"); isConnecting = true; };
         socket.OnClose += (e) => { Debug.LogError("Disconnect to socket: " + e); isConnecting = false; };
         socket.OnError += (e) => { Debug.LogError("Error of socket: " + e); isConnecting = false; };
-        socket.OnMessage += (bytes) =>
-        {
-            var message = System.Text.Encoding.UTF8.GetString(bytes);
-            Debug.Log("Received OnMessage! (" + bytes.Length + " bytes) " + message);
-            HandleMessage(message);
-        };
 
         socket.Connect();
 
@@ -55,10 +49,5 @@ partial class CustomSocket : MonoBehaviour
         if (socket != null)
             socket.DispatchMessageQueue();
 #endif 
-    }
-
-    private void HandleMessage(string message)
-    {
-
     }
 }

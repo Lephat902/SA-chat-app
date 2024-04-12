@@ -91,10 +91,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   async handleDisconnect(client: WebSocket) {
+    // Get userId BEFORE removing
+    const userId = this.userSocketsMap.getUserIdByClient(client);
+
     this.userSocketsMap.removeConnection(client);
     this.conversationSocketsMap.removeClient(client);
 
-    const userId = this.userSocketsMap.getUserIdByClient(client);
     if (userId) {
       const newNumberOfSocketConnections = this.userSocketsMap.getNumOfClientsByUserId(userId);
       if (newNumberOfSocketConnections === 0)

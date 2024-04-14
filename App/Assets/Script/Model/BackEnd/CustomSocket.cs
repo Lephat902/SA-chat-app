@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using NativeWebSocket;
 using System.Collections.Generic;
+using UnityEngine.Events;
 
 partial class CustomSocket : MonoBehaviour
 {
@@ -10,13 +11,27 @@ partial class CustomSocket : MonoBehaviour
 
     private const string DOMAIN = "wss://chatapp.tutorify.site";
     private static WebSocket socket;
-    private bool isConnecting;
+
+    public static UnityEvent<string> connectSocketEvent = new();
+    private static UnityEvent<WebSocket> createSocketEvent = new();
+
+    private void Start()
+    {
+        createSocketEvent.AddListener(StartFriend);
+        createSocketEvent.AddListener(StartChat);
+        connectSocketEvent.AddListener(StartConnect);
+    }
+
+    private void OnDestroy()
+    {
+        createSocketEvent.RemoveAllListeners();
+        createSocketEvent.RemoveAllListeners();
+        connectSocketEvent.RemoveAllListeners();
+    }
 
     // Start is called before the first frame update
-    public async UniTask StartConnect()
+    private async void StartConnect(string accessToken)
     {
-        isConnecting = false;
-
         Debug.Log("Start connect to socket: " + DOMAIN);
         /*var uri = new Uri(DOMAIN);
         socket = new SocketIOUnity(uri, new SocketIOOptions
@@ -30,17 +45,20 @@ partial class CustomSocket : MonoBehaviour
 
         socket.Connect();*/
 
-        socket = new WebSocket(DOMAIN + string.Format("?token={0}", userDataAsset.AccessToken));//, new Dictionary<string, string> { { "token", userDataAsset.AccessToken } });
-        socket.OnOpen += () => { Debug.Log("Done connect to socket"); isConnecting = true; };
-        socket.OnClose += (e) => { Debug.LogError("Disconnect to socket: " + e); isConnecting = false; };
-        socket.OnError += (e) => { Debug.LogError("Error of socket: " + e); isConnecting = false; };
+        socket = new WebSocket(DOMAIN + string.Format("?token={0}", accessToken));//, new Dictionary<string, string> { { "token", userDataAsset.AccessToken } });
+        socket.OnOpen += () => { Debug.Log("Done connect to socket"); };
+        socket.OnClose += (e) =>
+        {
+            Debug.LogError("Disconnect to socket: " + e);
+            NotificationController.OnNotiEvent.Invoke("You have disconnected with web socket!");
+        };
+        socket.OnError += (e) => { Debug.LogError("Error of socket: " + e); };
 
         socket.Connect();
 
-        StartFriend();
-        StartChat();
+        createSocketEvent.Invoke(socket);
 
-        await UniTask.WaitUntil(() => isConnecting);
+        await UniTask.WaitUntil(() => socket.State == WebSocketState.Connecting);
     }
 
     private void Update()
@@ -51,8 +69,5 @@ partial class CustomSocket : MonoBehaviour
 #endif 
     }
 
-    private void OnDestroy()
-    {
-        socket.Close();
-    }
+    public static bool IsConnecting => socket.State == WebSocketState.Connecting;
 }

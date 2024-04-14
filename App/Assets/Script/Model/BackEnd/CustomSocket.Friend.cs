@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using SocketIOClient;
-using SocketIOClient.Newtonsoft.Json;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using NativeWebSocket;
+using System.Collections.Generic;
 using UnityEngine.Events;
-using UnityEngine.UI;
 
 [Serializable]
 public struct SocketFriendRequestEvent
@@ -41,7 +40,7 @@ public struct FriendMessageUpdate
 
 partial class CustomSocket : MonoBehaviour
 {
-    private void StartFriend()
+    private void StartFriend(WebSocket socketParam)
     {
         /*socket.OnUnityThread("friend-request-sent",
             res =>HandleFriendMessageRequest(CustomJson<FriendMessageRequest>.ParseList(res.ToString())[0]));
@@ -49,7 +48,7 @@ partial class CustomSocket : MonoBehaviour
         socket.OnUnityThread("friend-request-updated",
             res => HandleFriendMessageUpdate(CustomJson<FriendMessageUpdate>.ParseList(res.ToString())[0]));*/
 
-        socket.OnMessage += (bytes) =>
+        socketParam.OnMessage += (bytes) =>
         {
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             HandleMessageFriend(message);

@@ -1,7 +1,9 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
+﻿using System;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
+using NativeWebSocket;
+using System.Collections.Generic;
+using UnityEngine.Events;
 
 [Serializable]
 public struct SocketChatSendEvent
@@ -52,7 +54,7 @@ public struct SocketChatReceiveEventData
 
 partial class CustomSocket : MonoBehaviour
 {
-    private void StartChat()
+    private void StartChat(WebSocket socketParam)
     {
         /*socket.OnUnityThread("conversation-created",
             res => HandleConversationCreated(CustomJson<ChatCreate>.ParseList(res.ToString())[0]));
@@ -60,7 +62,7 @@ partial class CustomSocket : MonoBehaviour
         socket.OnUnityThread("receive-message",
             res => HandleReceiveMessage(CustomJson<ChatReceive>.ParseList(res.ToString())[0]));*/
 
-        socket.OnMessage += (bytes) =>
+        socketParam.OnMessage += (bytes) =>
         {
             var message = System.Text.Encoding.UTF8.GetString(bytes);
             Debug.Log("Received OnMessage! (" + bytes.Length + " bytes) " + message);

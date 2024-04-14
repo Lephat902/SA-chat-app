@@ -50,4 +50,9 @@ partial class CustomSocket : MonoBehaviour
             socket.DispatchMessageQueue();
 #endif 
     }
+
+    private void OnDestroy()
+    {
+        socket.Close();
+    }
 }

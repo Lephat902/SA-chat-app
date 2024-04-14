@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 class UserProfileView: MonoBehaviour
@@ -9,9 +11,25 @@ class UserProfileView: MonoBehaviour
     [SerializeField] private TextMeshProUGUI userID;
     [SerializeField] private TextMeshProUGUI userName;
     [SerializeField] private Image userAvatar;
+    [SerializeField] private Button logOutBtn;
 
     [Header("Other")]
     [SerializeField] private Sprite defaultSpite;
+
+    private void Start()
+    {
+        logOutBtn.onClick.AddListener(LogOut);
+    }
+
+    private void OnDestroy()
+    {
+        logOutBtn.onClick.RemoveAllListeners();
+    }
+
+    private void LogOut()
+    {
+        SceneManager.LoadScene("SignIn", LoadSceneMode.Single);
+    }
 
     public void SetUI(string id, string name, string avatarUrl)
     {

@@ -25,7 +25,6 @@ public class SignUpController : MonoBehaviour
 
     [Header("Other")]
     [SerializeField] private TextMeshProUGUI statusText;
-    [SerializeField] private CustomSocket customSocket;
 
     [Header("Data")]
     [SerializeField] private UserDataAsset userDataAsset;
@@ -137,7 +136,8 @@ public class SignUpController : MonoBehaviour
 
                 statusText.text = "Connecting to socket!";
 
-                await customSocket.StartConnect();
+                CustomSocket.connectSocketEvent.Invoke(userDataAsset.AccessToken);
+                await UniTask.WaitUntil(() => CustomSocket.IsConnecting);
 
                 SceneManager.LoadScene("Home", LoadSceneMode.Single);
             },

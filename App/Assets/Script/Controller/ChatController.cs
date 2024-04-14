@@ -138,8 +138,7 @@ public class ChatController : MonoBehaviour
         await UniTask.DelayFrame(5);
         chatConversationContentObj.gameObject.SetActive(true);
 
-        await UniTask.DelayFrame(20);
-        scrollRect.normalizedPosition = new Vector2(0, 0);
+        ScrollUIToBottom();
     }
 
     private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
@@ -178,9 +177,8 @@ public class ChatController : MonoBehaviour
 
     private async void ScrollUIToBottom()
     {
-        await UniTask.DelayFrame(20);
-        if (scrollRect.verticalNormalizedPosition <= 0.3)
-            scrollRect.normalizedPosition = new Vector2(0, 0);
+        await UniTask.DelayFrame(30);
+        scrollRect.normalizedPosition = new Vector2(0, 0);
     }
 
     #endregion

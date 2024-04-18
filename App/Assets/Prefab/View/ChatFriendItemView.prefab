@@ -252,6 +252,7 @@ MonoBehaviour:
   userName: {fileID: 7556089001121776263}
   userAvatar: {fileID: 8226203106472859546}
   defaultSpite: {fileID: 21300000, guid: 9071bd94a201f894fa7fc362fb9d0b44, type: 3}
+  copyIdBtn: {fileID: 3403322216411678785}
   userDataAsset: {fileID: 11400000, guid: 25d5bcbe649f13143a562ea51732dff1, type: 2}
   chatDataAsset: {fileID: 11400000, guid: 725ae65ca09b5d74bb8621fb497a222e, type: 2}
   chatBtn: {fileID: 8831640376666250096}
@@ -269,6 +270,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3403322216411678785 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1095778387579305393, guid: a7b960195388c3d40b955d6b5ad93dbb, type: 3}
+  m_PrefabInstance: {fileID: 2310341272300107248}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &7556089001121776263 stripped

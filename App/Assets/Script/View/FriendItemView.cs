@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,6 +12,8 @@ public class FriendItemView : MonoBehaviour
     [SerializeField] protected TextMeshProUGUI userName;
     [SerializeField] protected Image userAvatar;
     [SerializeField] protected Sprite defaultSpite;
+    [SerializeField] protected Button copyIdBtn;
+
     protected FriendDataModel friendDataModel;
 
     public virtual void SetUI(FriendDataModel friendDataModel)
@@ -19,6 +22,15 @@ public class FriendItemView : MonoBehaviour
         userName.text = friendDataModel.username;
         StartCoroutine(LoadImage(friendDataModel.avatar));
         this.friendDataModel = friendDataModel;
+
+        copyIdBtn.onClick.RemoveAllListeners();
+        copyIdBtn.onClick.AddListener(CopyId);
+    }
+
+    private void CopyId()
+    {
+        GUIUtility.systemCopyBuffer = friendDataModel.id;
+        NotificationController.OnCopy.Invoke(friendDataModel.id);
     }
 
     private IEnumerator LoadImage(string avatarUrl)

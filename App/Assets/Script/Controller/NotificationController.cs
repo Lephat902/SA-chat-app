@@ -17,9 +17,14 @@ public class NotificationController : MonoBehaviour
     [SerializeField] private GameObject fxNewFriend;
     [SerializeField] private GameObject fxNewFriendRequest;
 
+    [Header("Copy")]
+    [SerializeField] private GameObject fxCopy;
+    [SerializeField] private TextMeshProUGUI copyTxt;
+
     public static UnityEvent<string> OnNotiEvent = new();
     public static UnityEvent OnNotiNewFriend = new();
     public static UnityEvent OnNotiNewFriendRequest = new();
+    public static UnityEvent<string> OnCopy = new();
 
     private void Start()
     {
@@ -27,6 +32,7 @@ public class NotificationController : MonoBehaviour
         OnNotiEvent.AddListener(OnNoti);
         OnNotiNewFriend.AddListener(OnNewFriend);
         OnNotiNewFriendRequest.AddListener(OnNewFriendRequest);
+        OnCopy.AddListener(OnCopyString);
     }
 
     private void OnDestroy()
@@ -35,6 +41,7 @@ public class NotificationController : MonoBehaviour
         OnNotiEvent.RemoveAllListeners();
         OnNotiNewFriend.RemoveAllListeners();
         OnNotiNewFriendRequest.RemoveAllListeners();
+        OnCopy.RemoveAllListeners();
     }
     private void OffNoti()
     {
@@ -73,5 +80,19 @@ public class NotificationController : MonoBehaviour
             await UniTask.DelayFrame(1);
             fxNewFriendRequest.SetActive(true);
         }
+    }
+
+    private async void OnCopyString(string txt)
+    {
+        if (!fxCopy.activeInHierarchy)
+            fxCopy.SetActive(true);
+        else
+        {
+            fxCopy.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxCopy.SetActive(true);
+        }
+
+        copyTxt.text = "Copied: " + txt;
     }
 }

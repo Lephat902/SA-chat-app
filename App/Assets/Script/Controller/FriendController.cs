@@ -39,6 +39,9 @@ public class FriendController : MonoBehaviour
     [SerializeField] private RequestFriendItemView friendRequestItemObj;
     [ReadOnly] [SerializeField] private List<RequestFriendItemView> listFriendRequest = new();
 
+    [Header("Fx")]
+    [SerializeField] private GameObject fxPow;
+
     public static UnityEvent<string> OnAcceptRequest = new();
     public static UnityEvent<string> OnRefuseRequest = new();
     public static UnityEvent<string, string> OnIsAddedRequest = new();
@@ -75,6 +78,18 @@ public class FriendController : MonoBehaviour
         friendSearchOpenBtn.onClick.RemoveAllListeners();
         friendRequestOpenBtn.onClick.RemoveAllListeners();
         friendSearchBtn.onClick.RemoveAllListeners();
+    }
+
+    private async void FxBoom()
+    {
+        if (!fxPow.activeInHierarchy)
+            fxPow.SetActive(true);
+        else
+        {
+            fxPow.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxPow.SetActive(true);
+        }
     }
 
     #region SetUI
@@ -169,6 +184,7 @@ public class FriendController : MonoBehaviour
 
     private void OpenTap(CanvasGroup tapObject, GameObject fx)
     {
+        FxBoom();
         friendCanvasGroup.alpha = 0;
         friendCanvasGroup.interactable = false;
         friendCanvasGroup.blocksRaycasts = false;
@@ -201,6 +217,7 @@ public class FriendController : MonoBehaviour
     #region ActionSearch
     private void SearchFriend()
     {
+        FxBoom();
         CustomHTTP.SearchFriend(friendSearchInput.text,
             (res) => { SetUISearch(res); },
             (err) => { });

@@ -34117,7 +34117,7 @@ GameObject:
   - component: {fileID: 7227629043642217535}
   - component: {fileID: 5364940552902770691}
   m_Layer: 0
-  m_Name: Fx_UI_menu_openCard_mythical
+  m_Name: Fx_UI_OpenChat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

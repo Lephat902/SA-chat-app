@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,11 @@ class MessageAvatarItemView : MonoBehaviour
     [SerializeField] private GameObject imageActive;
     [SerializeField] private Button button;
     [SerializeField] private Sprite defaultSpite;
-    [SerializeField] private string curId;
     private HeaderConversationDataModel conversationDataModel;
+
+    [Header("Fx")]
+    [SerializeField] private GameObject fxOnClick;
+    [SerializeField] private GameObject fxOnEnable;
 
     public void SetUp(HeaderConversationDataModel conversationDataModel)
     {
@@ -37,7 +41,6 @@ class MessageAvatarItemView : MonoBehaviour
 
 
         this.conversationDataModel = conversationDataModel;
-        curId = conversationDataModel.id;
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OpenChat);
@@ -60,8 +63,17 @@ class MessageAvatarItemView : MonoBehaviour
         return default;
     }
 
-    private void OpenChat()
+    private async void OpenChat()
     {
+        if (!fxOnClick.activeInHierarchy)
+            fxOnClick.SetActive(true);
+        else
+        {
+            fxOnClick.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxOnClick.SetActive(true);
+        }
+
         ChatController.OnConversationOpen.Invoke(conversationDataModel.id);
     }
 
@@ -80,9 +92,17 @@ class MessageAvatarItemView : MonoBehaviour
     private void Update()
     {
         if (conversationDataModel.id == ChatController.CurConversationId && !imageActive.activeInHierarchy)
+        {
             imageActive.SetActive(true);
+            fxOnEnable.SetActive(true);
+        }
+
         else if (conversationDataModel.id != ChatController.CurConversationId && imageActive.activeInHierarchy)
+        {
             imageActive.SetActive(false);
+            fxOnEnable.SetActive(false);
+        }
+
     }
 }
 

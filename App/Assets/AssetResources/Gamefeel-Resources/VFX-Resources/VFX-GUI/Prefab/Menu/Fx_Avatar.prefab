@@ -9770,7 +9770,7 @@ GameObject:
   - component: {fileID: 2410737858723473498}
   - component: {fileID: 5543558785495224180}
   m_Layer: 5
-  m_Name: Fx_UI_ingame_hint_season
+  m_Name: Fx_Avatar
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

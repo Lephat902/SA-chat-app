@@ -30,6 +30,10 @@ public class ChatController : MonoBehaviour
     [SerializeField] private TMP_InputField messageSendInput;
     private bool isOn;
 
+    [Header("Fx")]
+    [SerializeField] private GameObject fxStartChat;
+    [SerializeField] private GameObject fxNewMessage;
+
     public static string CurConversationId => curConversationId;
 
     public static UnityEvent<HeaderConversationDataModel> OnConversationCreate = new();
@@ -96,6 +100,15 @@ public class ChatController : MonoBehaviour
 
     private async void SetUIChat(string conversationId)
     {
+        if (!fxStartChat.activeInHierarchy)
+            fxStartChat.SetActive(true);
+        else
+        {
+            fxStartChat.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxStartChat.SetActive(true);
+        }
+
         if (chatDataAsset.ConversationList == null)
             return;
 
@@ -141,7 +154,7 @@ public class ChatController : MonoBehaviour
         ScrollUIToBottom();
     }
 
-    private void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
+    private async void AddUIChat(string conversationId, MessageConversationDataModel chatDataModel)
     {
         if (conversationId != curConversationId)
             return;
@@ -173,6 +186,18 @@ public class ChatController : MonoBehaviour
         }
 
         ScrollUIToBottom();
+
+        if (chatDataModel.userId == userDataAsset.UserDataModel.id)
+            return;
+
+        if (!fxNewMessage.activeInHierarchy)
+            fxNewMessage.SetActive(true);
+        else
+        {
+            fxNewMessage.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxNewMessage.SetActive(true);
+        }
     }
 
     private async void ScrollUIToBottom()

@@ -182,6 +182,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: RuntimeController
       objectReference: {fileID: 0}
+    - target: {fileID: 7461824896494351297, guid: 2db656257e0b10447ab9a4fd9d6f8698, type: 3}
+      propertyPath: Loop
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2db656257e0b10447ab9a4fd9d6f8698, type: 3}
 --- !u!1 &1031436178

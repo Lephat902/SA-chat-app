@@ -32,7 +32,8 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private ChatDataAsset chatDataAsset;
 
     [Header("Fx")]
-    [SerializeField] private GameObject FxChangeTab;
+    [SerializeField] private GameObject fxChangeTab;
+    [SerializeField] private GameObject fxGoToHome;
 
     void Start()
     {
@@ -69,8 +70,17 @@ public class SignUpController : MonoBehaviour
             (err) => { statusText.text = err.message[0]; });
     }
 
-    private void SwitchToSignIn()
+    private async void SwitchToSignIn()
     {
+        if (!fxChangeTab.activeInHierarchy)
+            fxChangeTab.SetActive(true);
+        else
+        {
+            fxChangeTab.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxChangeTab.SetActive(true);
+        }
+
         signUpObject.SetActive(false);
         signInObject.SetActive(true);
         ClearStatus();
@@ -96,13 +106,13 @@ public class SignUpController : MonoBehaviour
 
     private async void SwitchToSignUp()
     {
-        if (!FxChangeTab.activeInHierarchy)
-            FxChangeTab.SetActive(true);
+        if (!fxChangeTab.activeInHierarchy)
+            fxChangeTab.SetActive(true);
         else
         {
-            FxChangeTab.SetActive(false);
+            fxChangeTab.SetActive(false);
             await UniTask.DelayFrame(1);
-            FxChangeTab.SetActive(true);
+            fxChangeTab.SetActive(true);
         }
 
         signUpObject.SetActive(true);
@@ -133,6 +143,8 @@ public class SignUpController : MonoBehaviour
     private void StartHome(string userName)
     {
         ActionAllButton(false);
+
+        fxGoToHome.SetActive(true);
 
         CustomHTTP.GetProfileByName(userName,
             async (res) =>

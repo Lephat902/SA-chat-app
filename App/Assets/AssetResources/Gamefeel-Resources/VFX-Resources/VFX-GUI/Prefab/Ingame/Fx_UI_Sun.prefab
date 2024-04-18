@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8159954693818776232}
   - component: {fileID: 269972872708847029}
   m_Layer: 0
-  m_Name: Fx_UI_menu_gentle_sparkle
+  m_Name: Fx_UI_Sun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

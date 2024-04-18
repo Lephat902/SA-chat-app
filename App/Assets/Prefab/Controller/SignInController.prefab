@@ -8,12 +8,16 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 386150001738640414, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 59b61788b37fc65439f6672a42a87938, type: 3}
+    - target: {fileID: 386150001738640414, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 386150001738640414, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_Color.g
-      value: 0.27780557
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1668493569181695760, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_Pivot.x
@@ -103,12 +107,36 @@ PrefabInstance:
       propertyPath: m_Name
       value: SignIn
       objectReference: {fileID: 0}
+    - target: {fileID: 1751978908902493401, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: -20
+      objectReference: {fileID: 0}
+    - target: {fileID: 1824910875931925604, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 1a7c31470cb3b164da5c649eb2b4c494, type: 3}
     - target: {fileID: 1824910875931925604, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_Color.b
-      value: 0.24072933
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1824910875931925604, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919536624394667922, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919536624399185849, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919536624660729169, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1919536625149408383, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6489744800504535539, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
@@ -118,6 +146,10 @@ PrefabInstance:
     - target: {fileID: 6680699150338308592, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_text
       value: Go to Sign Up
+      objectReference: {fileID: 0}
+    - target: {fileID: 6680699150338308592, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
+      propertyPath: m_fontSize
+      value: 44.5
       objectReference: {fileID: 0}
     - target: {fileID: 8822529707817723175, guid: 5c283838e2a92854d8e66236fc03ab17, type: 3}
       propertyPath: m_IsActive

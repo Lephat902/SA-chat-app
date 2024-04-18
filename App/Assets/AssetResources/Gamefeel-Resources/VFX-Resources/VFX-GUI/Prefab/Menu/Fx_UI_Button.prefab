@@ -9762,7 +9762,7 @@ GameObject:
   - component: {fileID: 6328297028564209842}
   - component: {fileID: 6328297028564209843}
   m_Layer: 0
-  m_Name: Fx_UI_menu_buttonPlay
+  m_Name: Fx_UI_Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

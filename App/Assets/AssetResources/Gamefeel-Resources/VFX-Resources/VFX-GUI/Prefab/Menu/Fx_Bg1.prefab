@@ -4843,7 +4843,7 @@ GameObject:
   - component: {fileID: 7165510339429518816}
   - component: {fileID: 7165510339429518823}
   m_Layer: 0
-  m_Name: Fx_UI_EventPass_PremiumReward
+  m_Name: Fx_Bg1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

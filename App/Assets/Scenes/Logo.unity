@@ -175,10 +175,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4766731021413410598, guid: 2db656257e0b10447ab9a4fd9d6f8698, type: 3}
-      propertyPath: introTime
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 4766731021413410598, guid: 2db656257e0b10447ab9a4fd9d6f8698, type: 3}
       propertyPath: canvasGroup
       value: 
       objectReference: {fileID: 1620108352}
@@ -264,7 +260,6 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0

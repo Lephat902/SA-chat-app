@@ -19586,7 +19586,7 @@ GameObject:
   - component: {fileID: 2470011682376425665}
   - component: {fileID: 7156797657884972012}
   m_Layer: 0
-  m_Name: Fx_UI_menu_medal
+  m_Name: Fx_UI_ButtonClick
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

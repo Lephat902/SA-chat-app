@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -9,6 +10,7 @@ public class AddFriendItemView : FriendItemView
     [SerializeField] private UserDataAsset userDataAsset;
     [SerializeField] private FriendDataAsset friendDataAsset;
     [SerializeField] private Button addFriendButton;
+    [SerializeField] private GameObject fxButtonClick;
 
     private void Start()
     {
@@ -26,8 +28,17 @@ public class AddFriendItemView : FriendItemView
         addFriendButton.gameObject.SetActive(true);
     }
 
-    private void AddFriend()
+    private async void AddFriend()
     {
+        if (!fxButtonClick.activeInHierarchy)
+            fxButtonClick.SetActive(true);
+        else
+        {
+            fxButtonClick.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxButtonClick.SetActive(true);
+        }
+
         CustomHTTP.SendRequestFriend(userDataAsset.AccessToken, friendDataModel.id,
             (result) =>
             {

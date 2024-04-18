@@ -15,6 +15,7 @@ public class FriendController : MonoBehaviour
 
     [Header("Friend")]
     [SerializeField] private Button friendOpenBtn;
+    [SerializeField] private GameObject fxFriendOpenBtn;
     [SerializeField] private CanvasGroup friendCanvasGroup;
     [SerializeField] private Transform friendContentObj;
     [SerializeField] private FriendItemView friendItemObj;
@@ -22,6 +23,7 @@ public class FriendController : MonoBehaviour
 
     [Header("Search")]
     [SerializeField] private Button friendSearchOpenBtn;
+    [SerializeField] private GameObject fxFriendSearchOpenBtn;
     [SerializeField] private CanvasGroup friendSearchCanvasGroup;
     [SerializeField] private Button friendSearchBtn;
     [SerializeField] private TMP_InputField friendSearchInput;
@@ -31,6 +33,7 @@ public class FriendController : MonoBehaviour
 
     [Header("Request")]
     [SerializeField] private Button friendRequestOpenBtn;
+    [SerializeField] private GameObject fxFriendRequestOpenBtn;
     [SerializeField] private CanvasGroup friendRequestCanvasGroup;
     [SerializeField] private Transform friendRequestContentObj;
     [SerializeField] private RequestFriendItemView friendRequestItemObj;
@@ -50,7 +53,7 @@ public class FriendController : MonoBehaviour
         OnIsAcceptedRequest.AddListener(IsAcceptedRequest);
         OnIsRefusedRequest.AddListener(IsRefusedRequest);
 
-        OpenTap(friendCanvasGroup);
+        OpenTap(friendCanvasGroup, fxFriendOpenBtn);
         SetUIFriend();
         SetUIRequest();
 
@@ -164,30 +167,34 @@ public class FriendController : MonoBehaviour
 
     #region ActionButton
 
-    private void OpenTap(CanvasGroup tapObject)
+    private void OpenTap(CanvasGroup tapObject, GameObject fx)
     {
         friendCanvasGroup.alpha = 0;
         friendCanvasGroup.interactable = false;
         friendCanvasGroup.blocksRaycasts = false;
+        fxFriendOpenBtn.SetActive(false);
 
         friendSearchCanvasGroup.alpha = 0;
         friendSearchCanvasGroup.interactable = false;
         friendSearchCanvasGroup.blocksRaycasts = false;
+        fxFriendSearchOpenBtn.SetActive(false);
 
         friendRequestCanvasGroup.alpha = 0;
         friendRequestCanvasGroup.interactable = false;
         friendRequestCanvasGroup.blocksRaycasts = false;
+        fxFriendRequestOpenBtn.SetActive(false);
 
         tapObject.alpha = 1;
         tapObject.interactable = true;
         tapObject.blocksRaycasts = true;
+        fx.SetActive(true);
     }
 
-    private void OpenFriend() => OpenTap(friendCanvasGroup);
+    private void OpenFriend() => OpenTap(friendCanvasGroup, fxFriendOpenBtn);
 
-    private void OpenFriendSearch() => OpenTap(friendSearchCanvasGroup);
+    private void OpenFriendSearch() => OpenTap(friendSearchCanvasGroup, fxFriendSearchOpenBtn);
 
-    private void OpenFriendRequest() => OpenTap(friendRequestCanvasGroup);
+    private void OpenFriendRequest() => OpenTap(friendRequestCanvasGroup, fxFriendRequestOpenBtn);
 
     #endregion
 
@@ -211,6 +218,7 @@ public class FriendController : MonoBehaviour
                 friendDataAsset.FriendList.Add(requestDataModel.requester);
                 SetUIRequest();
                 SetUIFriend();
+                NotificationController.OnNotiNewFriend.Invoke();
                 return;
             }
         }
@@ -247,6 +255,7 @@ public class FriendController : MonoBehaviour
 
                 friendDataAsset.RequestList.Add(new RequestDataModel() { id = requestId, requester = friendDataModel });
                 SetUIRequest();
+                NotificationController.OnNotiNewFriendRequest.Invoke();
             },
             (err) => { });
     }
@@ -269,6 +278,7 @@ public class FriendController : MonoBehaviour
 
                 friendDataAsset.FriendList.Add(friendDataModel);
                 SetUIFriend();
+                NotificationController.OnNotiNewFriend.Invoke();
             },
             (err) => { });
     }

@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,18 +13,28 @@ public class NotificationController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI contentTxt;
     [SerializeField] private Button okBtn;
 
+    [Header("Friend")]
+    [SerializeField] private GameObject fxNewFriend;
+    [SerializeField] private GameObject fxNewFriendRequest;
+
     public static UnityEvent<string> OnNotiEvent = new();
+    public static UnityEvent OnNotiNewFriend = new();
+    public static UnityEvent OnNotiNewFriendRequest = new();
 
     private void Start()
     {
         okBtn.onClick.AddListener(OffNoti);
         OnNotiEvent.AddListener(OnNoti);
+        OnNotiNewFriend.AddListener(OnNewFriend);
+        OnNotiNewFriendRequest.AddListener(OnNewFriendRequest);
     }
 
     private void OnDestroy()
     {
         okBtn.onClick.RemoveAllListeners();
         OnNotiEvent.RemoveAllListeners();
+        OnNotiNewFriend.RemoveAllListeners();
+        OnNotiNewFriendRequest.RemoveAllListeners();
     }
     private void OffNoti()
     {
@@ -38,5 +49,29 @@ public class NotificationController : MonoBehaviour
         canvasGroup.alpha = 1;
         canvasGroup.blocksRaycasts = true;
         canvasGroup.interactable = true;
+    }
+
+    private async void OnNewFriend()
+    {
+        if (!fxNewFriend.activeInHierarchy)
+            fxNewFriend.SetActive(true);
+        else
+        {
+            fxNewFriend.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxNewFriend.SetActive(true);
+        }
+    }
+
+    private async void OnNewFriendRequest()
+    {
+        if (!fxNewFriendRequest.activeInHierarchy)
+            fxNewFriendRequest.SetActive(true);
+        else
+        {
+            fxNewFriendRequest.SetActive(false);
+            await UniTask.DelayFrame(1);
+            fxNewFriendRequest.SetActive(true);
+        }
     }
 }

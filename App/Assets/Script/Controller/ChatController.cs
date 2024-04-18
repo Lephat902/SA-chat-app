@@ -30,6 +30,16 @@ public class ChatController : MonoBehaviour
     [SerializeField] private TMP_InputField messageSendInput;
     private bool isOn;
 
+    [Header("Group")]
+    [SerializeField] private TMP_InputField groupNameInput;
+    [SerializeField] private TMP_InputField groupDescriptionInput;
+    [SerializeField] private TMP_InputField groupUserIdInput;
+    [SerializeField] private TMP_InputField groupAvatarInput;
+    [SerializeField] private Button groupCreateBtn;
+    [SerializeField] private Button addBtn;
+    [SerializeField] private TMP_InputField addUserIdInput;
+
+
     [Header("Fx")]
     [SerializeField] private GameObject fxStartChat;
     [SerializeField] private GameObject fxNewMessage;
@@ -53,6 +63,9 @@ public class ChatController : MonoBehaviour
 
         chatOpenBtn.onClick.AddListener(OnOff);
         messageSendBtn.onClick.AddListener(SendMessage);
+
+        groupCreateBtn.onClick.AddListener(CreateGroup);
+        addBtn.onClick.AddListener(AddUser);
     }
 
     private void OnDestroy()
@@ -63,6 +76,9 @@ public class ChatController : MonoBehaviour
 
         chatOpenBtn.onClick.RemoveAllListeners();
         messageSendBtn.onClick.RemoveAllListeners();
+
+        groupCreateBtn.onClick.RemoveAllListeners();
+        addBtn.onClick.RemoveAllListeners();
     }
 
     #region SetUI
@@ -236,6 +252,28 @@ public class ChatController : MonoBehaviour
         CustomSocket.SendChatMessage(curConversationId, messageSendInput.text);
 
         messageSendInput.text = "";
+    }
+
+    private void CreateGroup()
+    {
+        CustomHTTP.CreateConversation(userDataAsset.AccessToken,
+                new CreateConversationDataModel()
+                {
+                    name = groupNameInput.text,
+                    description = groupDescriptionInput.text,
+                    avatar = groupAvatarInput.text,
+                    initialMembers = new() { groupUserIdInput.text }
+                },
+                (res) =>
+                {
+                    ChatController.OnConversationCreate.Invoke(res);
+                    ChatController.OnConversationOpen.Invoke(res.id);
+                });
+    }
+
+    private void AddUser()
+    {
+        CustomHTTP.AddToConversation(userDataAsset.AccessToken, curConversationId, addUserIdInput.text, () => { }); ;
     }
 
     #endregion

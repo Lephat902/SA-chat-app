@@ -95,4 +95,15 @@ public static partial class CustomHTTP
         else
             result.Invoke(CustomJson<MessageConversationDataModel>.ParseList(response.message));
     }
+
+    public static async void AddToConversation(string accessToken, string conversationId, string userId, Action result)
+    {
+        var url = DOMAIN + "/conversations/groups/" + conversationId + "/members/" + userId;
+        var response = await POST(url, null, accessToken);
+
+        if (!response.isSuccess)
+            Debug.LogError("Can't add member: " + response.message);
+        else
+            result.Invoke();
+    }
 }

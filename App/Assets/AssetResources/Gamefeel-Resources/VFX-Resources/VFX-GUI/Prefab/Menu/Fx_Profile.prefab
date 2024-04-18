@@ -4905,7 +4905,7 @@ GameObject:
   - component: {fileID: 6388359893821310511}
   - component: {fileID: 9100521530210622285}
   m_Layer: 0
-  m_Name: Fx_UI_menu_upgrade_thenion_itemDetail
+  m_Name: Fx_Profile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

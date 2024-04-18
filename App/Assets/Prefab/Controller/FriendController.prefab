@@ -989,6 +989,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5000043773182469904}
     m_Modifications:
+    - target: {fileID: 1918065181396117504, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2766956439438132718, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
       propertyPath: m_SortingLayer
       value: 0
@@ -1125,6 +1129,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5000043773182469904}
     m_Modifications:
+    - target: {fileID: 1918065181396117504, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2766956439438132718, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
       propertyPath: m_SortingLayer
       value: 0
@@ -1281,6 +1289,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4278190080
       objectReference: {fileID: 0}
+    - target: {fileID: 9165632606360172475, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: 35e0f216727829c4989039b63a62ad1f, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
 --- !u!114 &838382856534366913 stripped
@@ -1326,6 +1338,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5000043773182469904}
     m_Modifications:
+    - target: {fileID: 1918065181396117504, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2766956439438132718, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
       propertyPath: m_SortingLayer
       value: 0
@@ -1470,6 +1486,10 @@ PrefabInstance:
       propertyPath: m_fontColor32.rgba
       value: 4278190080
       objectReference: {fileID: 0}
+    - target: {fileID: 9165632606360172475, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
+      propertyPath: m_audioClip
+      value: 
+      objectReference: {fileID: 8300000, guid: dcc2ce3a3a6c0f94c9370426ef8dae00, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 26b9e32eddd5dc7459ea0a85ab1e511c, type: 3}
 --- !u!1 &1062713585825345065 stripped

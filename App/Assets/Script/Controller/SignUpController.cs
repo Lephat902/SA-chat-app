@@ -31,6 +31,9 @@ public class SignUpController : MonoBehaviour
     [SerializeField] private FriendDataAsset friendDataAsset;
     [SerializeField] private ChatDataAsset chatDataAsset;
 
+    [Header("Fx")]
+    [SerializeField] private GameObject FxChangeTab;
+
     void Start()
     {
         signUpButton.onClick.AddListener(SignUp);
@@ -91,8 +94,17 @@ public class SignUpController : MonoBehaviour
             (err) => { statusText.text = err.message[0]; });
     }
 
-    private void SwitchToSignUp()
+    private async void SwitchToSignUp()
     {
+        if (!FxChangeTab.activeInHierarchy)
+            FxChangeTab.SetActive(true);
+        else
+        {
+            FxChangeTab.SetActive(false);
+            await UniTask.DelayFrame(1);
+            FxChangeTab.SetActive(true);
+        }
+
         signUpObject.SetActive(true);
         signInObject.SetActive(false);
         ClearStatus();

@@ -48,11 +48,14 @@ partial class CustomSocket : MonoBehaviour
         socket.OnUnityThread("friend-request-updated",
             res => HandleFriendMessageUpdate(CustomJson<FriendMessageUpdate>.ParseList(res.ToString())[0]));*/
 
-        socketParam.OnMessage += (bytes) =>
-        {
-            var message = System.Text.Encoding.UTF8.GetString(bytes);
-            HandleMessageFriend(message);
-        };
+        socketParam.OnMessage -= RegisterFriend;
+        socketParam.OnMessage += RegisterFriend;
+    }
+
+    private void RegisterFriend(byte[] bytes)
+    {
+        var message = System.Text.Encoding.UTF8.GetString(bytes);
+        HandleMessageFriend(message);
     }
 
     private void HandleMessageFriend(string message)

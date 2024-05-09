@@ -21,7 +21,7 @@ class MessageChatItemView : MonoBehaviour
     [SerializeField] private RectTransform myFakeTransform;
     [SerializeField] private ContentSizeFitter myFakeContentSize;
 
-    public async void SetUp(MessageConversationDataModel chatDataModel)
+    public async void SetUp(MessageConversationDataModel chatDataModel, HeaderConversationDataModel headerConversationDataModel)
     {
         if (chatDataModel.userId == userDataAsset.UserDataModel.id)
         {
@@ -32,17 +32,24 @@ class MessageChatItemView : MonoBehaviour
         }
         else
         {
-            myFakeTxt.gameObject.SetActive(false);
-            otherHeaderTxt.text = chatDataModel.userId;
-            otherFakeTxt.text = chatDataModel.text;
-            otherRealxt.text = chatDataModel.text;
-            otherFakeTxt.gameObject.SetActive(true);
+            for (int i = 0; i < headerConversationDataModel.users.Count; i++)
+            {
+                if (headerConversationDataModel.users[i].id == chatDataModel.userId)
+                {
+                    myFakeTxt.gameObject.SetActive(false);
+                    otherHeaderTxt.text = headerConversationDataModel.users[i].username;
+                    otherFakeTxt.text = chatDataModel.text;
+                    otherRealxt.text = chatDataModel.text;
+                    otherFakeTxt.gameObject.SetActive(true);
+                    break;
+                }
+            }
         }
 
         otherFakeContentSize.SetLayoutVertical();
         myFakeContentSize.SetLayoutVertical();
         await UniTask.DelayFrame(20);
-        
+
         SetMainLayOut(chatDataModel);
     }
 

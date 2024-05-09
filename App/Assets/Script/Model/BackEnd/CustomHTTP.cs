@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 
 public static partial class CustomHTTP
 {
-    public const string DOMAIN = "https://chatapp.tutorify.site";
+    public const string DOMAIN = "https://sa-chat-app-jjav6azlxq-as.a.run.app";
 
     #region HttpClient
     /*private static async Task<HttpResponseMessage> POST(string url, object data)

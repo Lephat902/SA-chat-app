@@ -9,7 +9,7 @@ partial class CustomSocket : MonoBehaviour
 {
     [SerializeField] private UserDataAsset userDataAsset;
 
-    private const string DOMAIN = "wss://chatapp.tutorify.site";
+    private const string DOMAIN = "wss://sa-chat-app-jjav6azlxq-as.a.run.app";
     private static WebSocket socket;
 
     public static UnityEvent<string> connectSocketEvent = new();

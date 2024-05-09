@@ -129,9 +129,15 @@ public class ChatController : MonoBehaviour
             return;
 
         List<MessageConversationDataModel> chatDataModels = null;
+        HeaderConversationDataModel headerConversationDataModel = new HeaderConversationDataModel();
         foreach (var conversationData in chatDataAsset.ConversationList)
             if (conversationData.Key.id == conversationId)
+            {
                 chatDataModels = conversationData.Value;
+                headerConversationDataModel = conversationData.Key;
+                break;
+            }
+
 
         if (chatDataModels == null)
             chatDataModels = new();
@@ -147,13 +153,13 @@ public class ChatController : MonoBehaviour
             if (i < listChat.Count)
             {
                 listChat[i].gameObject.SetActive(true);
-                listChat[i].SetUp(chatDataModel);
+                listChat[i].SetUp(chatDataModel, headerConversationDataModel);
             }
 
             else
             {
                 var newItem = Instantiate(messageChatItemObj, chatConversationContentObj);
-                newItem.SetUp(chatDataModel);
+                newItem.SetUp(chatDataModel, headerConversationDataModel);
                 listChat.Add(newItem);
             }
         }
@@ -178,10 +184,16 @@ public class ChatController : MonoBehaviour
         if (chatDataAsset.ConversationList == null)
             return;
 
+        HeaderConversationDataModel headerConversationDataModel = new HeaderConversationDataModel();
         List<MessageConversationDataModel> chatDataModels = null;
         foreach (var conversationData in chatDataAsset.ConversationList)
             if (conversationData.Key.id == conversationId)
+            {
+                headerConversationDataModel = conversationData.Key;
                 chatDataModels = conversationData.Value;
+                break;
+            }
+                
 
         if (chatDataModels == null)
             return;
@@ -189,14 +201,14 @@ public class ChatController : MonoBehaviour
         if (curConversationIndex < listChat.Count - 1)
         {
             listChat[curConversationIndex + 1].gameObject.SetActive(true);
-            listChat[curConversationIndex + 1].SetUp(chatDataModel);
+            listChat[curConversationIndex + 1].SetUp(chatDataModel, headerConversationDataModel);
             curConversationIndex++;
         }
 
         else
         {
             var newItem = Instantiate(messageChatItemObj, chatConversationContentObj);
-            newItem.SetUp(chatDataModel);
+            newItem.SetUp(chatDataModel, headerConversationDataModel);
             listChat.Add(newItem);
             curConversationIndex = listChat.Count - 1;
         }

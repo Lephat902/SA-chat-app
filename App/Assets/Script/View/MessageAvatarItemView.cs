@@ -27,40 +27,31 @@ class MessageAvatarItemView : MonoBehaviour
 
     public void SetUp(HeaderConversationDataModel conversationDataModel)
     {
-        var conversationFriend = CheckDirectChat(conversationDataModel.id);
-        if (conversationFriend.id != null && conversationFriend.id != string.Empty)
-        {
-            StartCoroutine(LoadImage(conversationFriend.avatar));
-            text.text = conversationFriend.username;
-        }
-        else
+        if (conversationDataModel.name != null 
+            && conversationDataModel.name != string.Empty
+            && conversationDataModel.name.Length > 0)
         {
             StartCoroutine(LoadImage(conversationDataModel.avatar));
             text.text = conversationDataModel.name;
         }
+        else
+        {
+            var users = conversationDataModel.users;
+            for(int i = 0; i < users.Count; i++)
+            {
+                if (users[i].id == userDataAsset.UserDataModel.id)
+                    continue;
 
+                StartCoroutine(LoadImage(users[i].avatar));
+                text.text = users[i].username;
+                break;
+            }
+        }
 
         this.conversationDataModel = conversationDataModel;
 
         button.onClick.RemoveAllListeners();
         button.onClick.AddListener(OpenChat);
-    }
-
-    private ConversationUserDataModel CheckDirectChat(string conversationId)
-    {
-        foreach (var conversationData in chatDataAsset.ConversationList)
-        {
-            if (conversationData.Key.id != conversationId)
-                continue;
-
-            var data = conversationData.Key.users;
-            if (data.Count == 2)
-                for (int j = 0; j < data.Count; j++)
-                    if (data[j].id != userDataAsset.UserDataModel.id)
-                        return data[j];
-        }
-
-        return default;
     }
 
     private async void OpenChat()

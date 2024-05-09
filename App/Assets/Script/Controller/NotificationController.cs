@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class NotificationController : MonoBehaviour
@@ -48,7 +49,7 @@ public class NotificationController : MonoBehaviour
         canvasGroup.alpha = 0;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
-        Application.Quit();
+        SceneManager.LoadScene("SignIn", LoadSceneMode.Single);
     }
 
     private void OnNoti(string text)

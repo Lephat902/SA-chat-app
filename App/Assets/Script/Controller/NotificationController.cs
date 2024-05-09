@@ -48,6 +48,7 @@ public class NotificationController : MonoBehaviour
         canvasGroup.alpha = 0;
         canvasGroup.blocksRaycasts = false;
         canvasGroup.interactable = false;
+        Application.Quit();
     }
 
     private void OnNoti(string text)

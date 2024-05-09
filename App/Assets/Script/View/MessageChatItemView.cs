@@ -10,7 +10,6 @@ class MessageChatItemView : MonoBehaviour
     [SerializeField] private UserDataAsset userDataAsset;
     [SerializeField] private TextMeshProUGUI otherFakeTxt;
     [SerializeField] private TextMeshProUGUI otherRealxt;
-    [SerializeField] private TextMeshProUGUI otherHeaderTxt;
     [SerializeField] private TextMeshProUGUI myFakeTxt;
     [SerializeField] private TextMeshProUGUI myRealTxt;
 
@@ -20,6 +19,8 @@ class MessageChatItemView : MonoBehaviour
     [SerializeField] private ContentSizeFitter otherFakeContentSize;
     [SerializeField] private RectTransform myFakeTransform;
     [SerializeField] private ContentSizeFitter myFakeContentSize;
+
+    private const string chatIdFormat = "<color=red>{0}</color>";
 
     public async void SetUp(MessageConversationDataModel chatDataModel, HeaderConversationDataModel headerConversationDataModel)
     {
@@ -37,9 +38,8 @@ class MessageChatItemView : MonoBehaviour
                 if (headerConversationDataModel.users[i].id == chatDataModel.userId)
                 {
                     myFakeTxt.gameObject.SetActive(false);
-                    otherHeaderTxt.text = headerConversationDataModel.users[i].username;
-                    otherFakeTxt.text = chatDataModel.text;
-                    otherRealxt.text = chatDataModel.text;
+                    otherFakeTxt.text = string.Format(chatIdFormat, headerConversationDataModel.users[i].username) + " \n" + chatDataModel.text;
+                    otherRealxt.text = string.Format(chatIdFormat, headerConversationDataModel.users[i].username) + " \n" + chatDataModel.text;
                     otherFakeTxt.gameObject.SetActive(true);
                     break;
                 }

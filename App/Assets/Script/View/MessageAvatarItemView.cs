@@ -93,7 +93,6 @@ class MessageAvatarItemView : MonoBehaviour
             imageActive.SetActive(false);
             fxOnEnable.SetActive(false);
         }
-
     }
 }
 

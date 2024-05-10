@@ -43,6 +43,7 @@ import { getTokenFromIncomingMessage, sendSocketEvent } from './helpers';
 @UsePipes(new ValidationPipe())
 @WebSocketGateway({
   transports: ['websocket'],
+  pingInterval: 3 * 3600 * 1000,
   cors: {
     origin: ["null", null, "https://html-classic.itch.zone"],
     methods: ["GET", "POST"],

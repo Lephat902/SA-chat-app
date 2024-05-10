@@ -1,12 +1,13 @@
 import { ClassSerializerInterceptor, INestApplication, InternalServerErrorException, ValidationPipe } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
 import { GlobalExceptionsFilter } from './global-exceptions-filter';
-import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
+// import { AsyncApiDocumentBuilder, AsyncApiModule } from 'nestjs-asyncapi';
 import { WsAdapter } from '@nestjs/platform-ws';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,7 +19,6 @@ async function bootstrap() {
 
   // Enable CORS with specific domain patterns
   app.enableCors({
-    allowedHeaders: ['content-type', 'authorization'],
     credentials: true,
     methods: 'GET,PUT,POST,PATCH,DELETE,UPDATE,OPTIONS',
     origin: (origin, callback) => {
@@ -43,6 +43,8 @@ async function bootstrap() {
     },
   });
 
+  app.use(helmet());
+
   // Apply the custom exception filter globally
   app.useGlobalFilters(new GlobalExceptionsFilter());
 
@@ -62,7 +64,7 @@ async function bootstrap() {
   // Set up Swagger documentation
   setUpSwagger(app);
 
-  await setUpAsyncApi(app);
+  // await setUpAsyncApi(app);
 
   // Start the application and listen on the specified port
   await app.listen(configService.get<number>('PORT'));
@@ -84,19 +86,19 @@ const setUpSwagger = (app: INestApplication<any>) => {
   SwaggerModule.setup('api', app, swaggerDocument);
 };
 
-const setUpAsyncApi = async (app: INestApplication<any>) => {
-  const asyncApiOptions = new AsyncApiDocumentBuilder()
-    .setTitle('Realtime Chat App API')
-    .setDescription('Chat created using Nest.js + Websockets')
-    .setVersion('1.0')
-    .setDefaultContentType('application/json')
-    .addSecurity('user-password', { type: 'userPassword' })
-    // .addServer('feline-ws', {
-    //   url: 'ws://localhost:3000',
-    //   protocol: 'socket.io',
-    // })
-    .build();
+// const setUpAsyncApi = async (app: INestApplication<any>) => {
+//   const asyncApiOptions = new AsyncApiDocumentBuilder()
+//     .setTitle('Realtime Chat App API')
+//     .setDescription('Chat created using Nest.js + Websockets')
+//     .setVersion('1.0')
+//     .setDefaultContentType('application/json')
+//     .addSecurity('user-password', { type: 'userPassword' })
+//     // .addServer('feline-ws', {
+//     //   url: 'ws://localhost:3000',
+//     //   protocol: 'socket.io',
+//     // })
+//     .build();
 
-  const asyncapiDocument = AsyncApiModule.createDocument(app, asyncApiOptions);
-  await AsyncApiModule.setup('socket-api', app, asyncapiDocument);
-};
+  // const asyncapiDocument = AsyncApiModule.createDocument(app, asyncApiOptions);
+  // await AsyncApiModule.setup('socket-api', app, asyncapiDocument);
+// };

@@ -30,7 +30,7 @@ import {
   FriendRequestUpdatedEvent,
 } from 'src/events';
 import { FriendService } from 'src/friend/services';
-import { AsyncApiPub, AsyncApiSub } from 'nestjs-asyncapi';
+// import { AsyncApiPub, AsyncApiSub } from 'nestjs-asyncapi';
 import { AddMessageDto, MarkMessageAsReadDto } from 'src/message/dtos';
 import { MessageService } from 'src/message/services';
 import { RequestStatus } from 'src/friend-request/entities';
@@ -104,26 +104,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @AsyncApiPub({
-    channel: 'ping',
-    message: {
-      payload: String
-    },
-    description: 'Used to check socket connection. Receive the same thing you sent to the server'
-  })
+  // @AsyncApiPub({
+  //   channel: 'ping',
+  //   message: {
+  //     payload: String
+  //   },
+  //   description: 'Used to check socket connection. Receive the same thing you sent to the server'
+  // })
   @SubscribeMessage('ping')
   handlePing(client: WebSocket, payload: unknown): void {
     console.log("I received the ping message", payload);
     client.send(JSON.stringify(payload));
   }
 
-  @AsyncApiPub({
-    channel: 'send-message',
-    message: {
-      payload: AddMessageDto
-    },
-    description: 'Publishes a message to be sent to a conversation.'
-  })
+  // @AsyncApiPub({
+  //   channel: 'send-message',
+  //   message: {
+  //     payload: AddMessageDto
+  //   },
+  //   description: 'Publishes a message to be sent to a conversation.'
+  // })
   @SubscribeMessage('send-message')
   async addMessage(client: WebSocket, addMessageDto: AddMessageDto) {
     const userId = this.userSocketsMap.getUserIdByClient(client);
@@ -132,13 +132,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.messageService.addMessage(addMessageDto);
   }
 
-  @AsyncApiSub({
-    channel: 'receive-message',
-    message: {
-      payload: ConversationMessageAddedEvent
-    },
-    description: 'Subscribes to receive messages sent to a conversation involving YOU.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'receive-message',
+  //   message: {
+  //     payload: ConversationMessageAddedEvent
+  //   },
+  //   description: 'Subscribes to receive messages sent to a conversation involving YOU.'
+  // })
   @OnEvent(CONVERSATION_MESSAGE_ADDED)
   async handleConversationMessageAddedEvent(event: ConversationMessageAddedEvent) {
     const { conversationId } = event;
@@ -147,13 +147,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(clientsInConversation, 'receive-message', event);
   }
 
-  @AsyncApiPub({
-    channel: 'mark-as-read',
-    message: {
-      payload: MarkMessageAsReadDto
-    },
-    description: 'Publishes an event to notify everyone in the conversation that you have read a message.'
-  })
+  // @AsyncApiPub({
+  //   channel: 'mark-as-read',
+  //   message: {
+  //     payload: MarkMessageAsReadDto
+  //   },
+  //   description: 'Publishes an event to notify everyone in the conversation that you have read a message.'
+  // })
   @SubscribeMessage('mark-as-read')
   async markMessageAsRead(client: WebSocket, markMessageAsReadDto: MarkMessageAsReadDto) {
     // Prepare
@@ -163,13 +163,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     await this.messageService.markAsLastRead(markMessageAsReadDto);
   }
 
-  @AsyncApiSub({
-    channel: 'last-read-message-updated',
-    message: {
-      payload: LastReadMessageUpdatedEvent
-    },
-    description: 'Subscribes to receive events when the last read message of a person in YOUR conversation is updated.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'last-read-message-updated',
+  //   message: {
+  //     payload: LastReadMessageUpdatedEvent
+  //   },
+  //   description: 'Subscribes to receive events when the last read message of a person in YOUR conversation is updated.'
+  // })
   @OnEvent(LAST_READ_MESSAGE_UPDATED_EVENT)
   async handleLastReadMessageUpdatedEvent(event: LastReadMessageUpdatedEvent) {
     const { conversationId } = event;
@@ -177,13 +177,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(clientsInConversation, 'last-read-message-updated', event);
   }
 
-  @AsyncApiSub({
-    channel: 'is-online',
-    message: {
-      payload: OnlineStatusUpdatedEvent
-    },
-    description: 'Subscribes to receive events when a FRIEND\'s online status is updated.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'is-online',
+  //   message: {
+  //     payload: OnlineStatusUpdatedEvent
+  //   },
+  //   description: 'Subscribes to receive events when a FRIEND\'s online status is updated.'
+  // })
   @OnEvent(ONLINE_STATUS_UPDATED_EVENT)
   async handleOnlineStatusUpdatedEvent(event: OnlineStatusUpdatedEvent) {
     const { userId } = event;
@@ -194,13 +194,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     })
   }
 
-  @AsyncApiSub({
-    channel: 'join',
-    message: {
-      payload: UserAddedToGroupEvent
-    },
-    description: 'Subscribes to receive events when a user joins a group conversation involving YOU.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'join',
+  //   message: {
+  //     payload: UserAddedToGroupEvent
+  //   },
+  //   description: 'Subscribes to receive events when a user joins a group conversation involving YOU.'
+  // })
   @OnEvent(USER_ADDED_TO_GROUP_EVENT)
   async handleUserAddedToGroupEvent(event: UserAddedToGroupEvent) {
     const { userId, conversationId } = event;
@@ -210,13 +210,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(clientsInConversation, 'join', event);
   }
 
-  @AsyncApiSub({
-    channel: 'leave',
-    message: {
-      payload: UserRemovedFromGroupEvent
-    },
-    description: 'Subscribes to receive events when a user leaves a group conversation involving YOU.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'leave',
+  //   message: {
+  //     payload: UserRemovedFromGroupEvent
+  //   },
+  //   description: 'Subscribes to receive events when a user leaves a group conversation involving YOU.'
+  // })
   @OnEvent(USER_REMOVED_FROM_GROUP_EVENT)
   async handleUserRemovedFromGroupEvent(event: UserRemovedFromGroupEvent) {
     const { conversationId, userId } = event;
@@ -226,13 +226,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(clientsInConversation, 'leave', event);
   }
 
-  @AsyncApiSub({
-    channel: 'conversation-created',
-    message: {
-      payload: ConversationCreatedEvent
-    },
-    description: 'Subscribes to receive events when a conversation involving YOU is created.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'conversation-created',
+  //   message: {
+  //     payload: ConversationCreatedEvent
+  //   },
+  //   description: 'Subscribes to receive events when a conversation involving YOU is created.'
+  // })
   @OnEvent(CONVERSATION_CREATED_EVENT)
   async handleConversationCreatedEvent(event: ConversationCreatedEvent) {
     const { conversationId, membersIdsList } = event;
@@ -247,13 +247,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(clientsInConversation, 'conversation-created', event);
   }
 
-  @AsyncApiSub({
-    channel: 'conversation-deleted',
-    message: {
-      payload: ConversationDeletedEvent
-    },
-    description: 'Subscribes to receive events when one of YOUR conversation is deleted.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'conversation-deleted',
+  //   message: {
+  //     payload: ConversationDeletedEvent
+  //   },
+  //   description: 'Subscribes to receive events when one of YOUR conversation is deleted.'
+  // })
   @OnEvent(CONVERSATION_DELETED_EVENT)
   async handleConversationDeletedEvent(event: ConversationDeletedEvent) {
     const { conversationId, membersIdsList } = event;
@@ -268,13 +268,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.conversationSocketsMap.removeClientsFromConversation(conversationId, eachUserClients);
   }
 
-  @AsyncApiSub({
-    channel: 'friend-request-sent',
-    message: {
-      payload: FriendRequestCreatedEvent
-    },
-    description: 'Subscribes to receive events when a friend request is sent.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'friend-request-sent',
+  //   message: {
+  //     payload: FriendRequestCreatedEvent
+  //   },
+  //   description: 'Subscribes to receive events when a friend request is sent.'
+  // })
   @OnEvent(FRIEND_REQUEST_CREATED_EVENT)
   async handleFriendRequestCreatedEvent(event: FriendRequestCreatedEvent) {
     const { recipientId } = event;
@@ -282,13 +282,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     sendSocketEvent(recipientClients, 'friend-request-sent', event);
   }
 
-  @AsyncApiSub({
-    channel: 'friend-request-updated',
-    message: {
-      payload: FriendRequestUpdatedEvent
-    },
-    description: 'Subscribes to receive events when the status of a friend request is updated.'
-  })
+  // @AsyncApiSub({
+  //   channel: 'friend-request-updated',
+  //   message: {
+  //     payload: FriendRequestUpdatedEvent
+  //   },
+  //   description: 'Subscribes to receive events when the status of a friend request is updated.'
+  // })
   @OnEvent(FRIEND_REQUEST_UPDATED_EVENT)
   async handleFriendRequestUpdatedEvent(event: FriendRequestUpdatedEvent) {
     const { requesterId, recipientId, newStatus } = event;

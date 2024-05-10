@@ -1,9 +1,9 @@
-import { ApiHideProperty, IntersectionType } from '@nestjs/swagger';
-import { PaginationDto } from 'src/common';
+import { ApiHideProperty } from '@nestjs/swagger';
 
-export class QueryConversationDto extends IntersectionType(
-  PaginationDto
-) {
+// export class QueryConversationDto extends IntersectionType(
+//   PaginationDto
+// ) {
+export class QueryConversationDto {
   @ApiHideProperty()
   userId: string;
 }

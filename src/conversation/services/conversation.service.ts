@@ -64,7 +64,8 @@ export class ConversationService {
   }
 
   async findAllConversationsWithRelationsByUserId(queryConversationDto: Readonly<QueryConversationDto>): Promise<Conversation[]> {
-    const { userId, page = 1, limit = 10 } = queryConversationDto;
+    // const { userId, page = 1, limit = 10 } = queryConversationDto;
+    const { userId } = queryConversationDto;
 
     // Constructing the query
     const queryBuilder = this.conversationRepository.createQueryBuilder('conversation')
@@ -84,8 +85,8 @@ export class ConversationService {
       });
 
     // Calculate offsets for pagination
-    const skip = (page - 1) * limit;
-    queryBuilder.skip(skip).take(limit);
+    // const skip = (page - 1) * limit;
+    // queryBuilder.skip(skip).take(limit);
 
     // Execute query and return result
     const conversations: Conversation[] = await queryBuilder.getMany();

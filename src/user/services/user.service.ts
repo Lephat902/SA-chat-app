@@ -21,7 +21,8 @@ export class UserService {
   ) { }
 
   async getAllUsersAndTotalCount(queryUserDto: QueryUserDto): Promise<PaginatedResults<User>> {
-    const { q, page = 1, limit = 10 } = queryUserDto;
+    // const { q, page = 1, limit = 10 } = queryUserDto;
+    const { q } = queryUserDto;
 
     // Create a query builder
     const queryBuilder = this.userRepository.createQueryBuilder('user');
@@ -32,8 +33,8 @@ export class UserService {
     }
 
     // Calculate offsets for pagination
-    const skip = (page - 1) * limit;
-    queryBuilder.skip(skip).take(limit);
+    // const skip = (page - 1) * limit;
+    // queryBuilder.skip(skip).take(limit);
 
     const [results, totalCount] = await queryBuilder.getManyAndCount();
     return { results, totalCount };
